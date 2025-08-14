@@ -17,8 +17,8 @@ impl ServerConfig {
         let _ = dotenvy::dotenv();
 
         let args: Vec<String> = env::args().collect();
-        let mut port = env::var("PORT").ok().and_then(|v| v.parse().ok()).unwrap_or(8080);
-        let host = env::var("HOST").unwrap_or_else(|_| "0.0.0.0".to_string());
+        let mut port = env::var("FRONTEND_PORT").ok().and_then(|v| v.parse().ok()).unwrap_or(8080);
+        let host = env::var("FRONTEND_HOST").unwrap_or_else(|_| "0.0.0.0".to_string());
         let mut root_dir = env::var("ROOT_DIR")
             .map(PathBuf::from)
             .unwrap_or_else(|_| PathBuf::from("frontend"));

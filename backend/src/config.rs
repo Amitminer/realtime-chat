@@ -19,13 +19,14 @@ impl Config {
     /// Construct configuration from environment variables.
     pub fn from_env() -> Result<Self, Box<dyn std::error::Error>> {
         // Coalesce unset or empty HOST to default
-        let host = env::var("HOST")
+        // Coalesce unset or empty HOST to default
+        let host = env::var("BACKEND_HOST")
             .ok()
             .filter(|v| !v.trim().is_empty())
             .unwrap_or_else(|| "0.0.0.0".to_string());
 
         // Coalesce unset or unparsable PORT to default
-        let port: u16 = env::var("PORT")
+        let port: u16 = env::var("BACKEND_PORT")
             .ok()
             .and_then(|v| v.parse().ok())
             .unwrap_or(9001);
