@@ -1,0 +1,35 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    environment:
+      - HOST=${BACKEND_HOST}
+      - PORT=${BACKEND_PORT}
+      - SERVER_PASSWORD=${SERVER_PASSWORD}
+      - RUST_BACKTRACE=1
+    command: ["/usr/local/bin/realtime-chat"]
+    tty: true
+    stdin_open: true
+    ports:
+      - "9001:9001"
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: .
+      dockerfile: http-serve/Dockerfile
+    environment:
+      - HOST=${FRONTEND_HOST}
+      - PORT=${FRONTEND_PORT}
+      - ROOT_DIR=/app/frontend
+      - LIVE_RELOAD=false
+      - WS_URL=${WS_URL}
+    # Entrypoint runs http-serve and validates ROOT_DIR
+    tty: true
+    stdin_open: true
+    ports:
+      - "8080:8080"
+    depends_on:
+      - backend
+    restart: unless-stopped

@@ -1,0 +1,14 @@
+# Node/JS
+node_modules/
+
+# Rust
+**/target/
+Cargo.lock
+
+# Env
+.env
+
+# Build artifacts
+/dist/
+/build/
+/.DS_Store

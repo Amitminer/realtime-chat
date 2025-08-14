@@ -1,0 +1,12 @@
+[package]
+name = "http-serve"
+version = "0.5.0"
+edition = "2021"
+
+[dependencies]
+notify = "8.2.0"
+dotenvy = "0.15.7"
+tungstenite = "0.21"
+sha1 = "0.10"
+base64 = "0.21"
+lazy_static = "1.4"
