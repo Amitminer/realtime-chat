@@ -36,25 +36,31 @@ pub async fn run_server(config: Config) -> Result<(), Box<dyn std::error::Error>
     println!("👂 Listening for encrypted connections...");
 
     let mut connection_count = 0;
-    while let Ok((stream, addr)) = listener.accept().await {
-        connection_count += 1;
-        println!(
-            "\n[DEBUG] 🔔 Encrypted connection #{connection_count} accepted from: {addr}"
-        );
+    loop {
+        match listener.accept().await {
+            Ok((stream, addr)) => {
+                connection_count += 1;
+                println!(
+                    "\n[DEBUG] 🔔 Encrypted connection #{connection_count} accepted from: {addr}"
+                );
 
-        let peer_map_clone = peer_map.clone();
-        let enc_clone = encryption_manager.clone();
-        let password = config.server_password.clone();
-        tokio::spawn(async move {
-            handle_connection(peer_map_clone, stream, addr, enc_clone, &password).await;
-            println!(
-                "[DEBUG] 🏁 Encrypted connection handler finished for: {addr}"
-            );
-        });
+                let peer_map_clone = peer_map.clone();
+                let enc_clone = encryption_manager.clone();
+                let password = config.server_password.clone();
+                tokio::spawn(async move {
+                    handle_connection(peer_map_clone, stream, addr, enc_clone, &password).await;
+                    println!(
+                        "[DEBUG] 🏁 Encrypted connection handler finished for: {addr}"
+                    );
+                });
+            }
+            Err(e) => {
+                eprintln!("[ERROR] accept() failed: {e}. Retrying in 500ms...");
+                tokio::time::sleep(std::time::Duration::from_millis(500)).await;
+                continue;
+            }
+        }
     }
-
-    println!("🛑 Encrypted server shutting down...");
-    Ok(())
 }
 
 /// Handle a single WebSocket connection lifecycle.

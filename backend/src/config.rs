@@ -18,15 +18,29 @@ pub struct Config {
 impl Config {
     /// Construct configuration from environment variables.
     pub fn from_env() -> Result<Self, Box<dyn std::error::Error>> {
-        let host = env::var("HOST").unwrap_or_else(|_| "0.0.0.0".to_string());
+        // Coalesce unset or empty HOST to default
+        let host = env::var("HOST")
+            .ok()
+            .filter(|v| !v.trim().is_empty())
+            .unwrap_or_else(|| "0.0.0.0".to_string());
+
+        // Coalesce unset or unparsable PORT to default
         let port: u16 = env::var("PORT")
             .ok()
             .and_then(|v| v.parse().ok())
             .unwrap_or(9001);
-        let bind_addr = env::var("BIND_ADDR").unwrap_or_else(|_| format!("{host}:{port}"));
 
+        // If BIND_ADDR is provided but empty, ignore it and build from host/port
+        let bind_addr = env::var("BIND_ADDR")
+            .ok()
+            .filter(|v| !v.trim().is_empty())
+            .unwrap_or_else(|| format!("{host}:{port}"));
+
+        // SERVER_PASSWORD must be present and non-empty
         let server_password = env::var("SERVER_PASSWORD")
-            .map_err(|_| "SERVER_PASSWORD is required. Set it in environment or .env")?;
+            .ok()
+            .filter(|v| !v.is_empty())
+            .ok_or("SERVER_PASSWORD is required. Set it in environment or .env")?;
 
         Ok(Self { bind_addr, server_password })
     }
