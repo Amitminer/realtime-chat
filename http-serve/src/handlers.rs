@@ -161,7 +161,7 @@ fn serve_runtime_config(stream: &mut TcpStream, ws_url: &Option<String>) {
         .as_ref()
         .map(|url| url.replace('\\', "\\\\").replace('\'', "\\'"))
         .unwrap_or_default();
-    let body = format!("window.__RUNTIME_CONFIG__ = {{ WS_URL: \\'{escaped_ws_url}\\' }}\n");
+    let body = format!("window.__RUNTIME_CONFIG__ = {{ WS_URL: '{escaped_ws_url}' }};\n");
     send_response(
         stream,
         200,

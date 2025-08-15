@@ -1,0 +1,16 @@
+omnicraft.ddns.net {
+    # Forward normal web requests to frontend
+    reverse_proxy frontend:8080
+
+    # Forward websocket traffic on /ws to backend
+    handle /ws {
+        reverse_proxy backend:9001
+    }
+
+    # Also handle websocket upgrades directly
+    @ws {
+        header Connection *Upgrade*
+        header Upgrade *websocket*
+    }
+    reverse_proxy @ws backend:9001
+}
