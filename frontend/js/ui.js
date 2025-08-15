@@ -166,7 +166,15 @@ export class UIManager {
     const container = this.elements.messagesContainer;
     // Use requestAnimationFrame to ensure DOM is updated before scrolling
     requestAnimationFrame(() => {
-      container.scrollTop = container.scrollHeight;
+      // For mobile, ensure we scroll smoothly
+      if (window.innerWidth <= 768) {
+        container.scrollTo({
+          top: container.scrollHeight,
+          behavior: 'smooth'
+        });
+      } else {
+        container.scrollTop = container.scrollHeight;
+      }
     });
   }
 

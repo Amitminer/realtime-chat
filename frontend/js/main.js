@@ -126,6 +126,15 @@ class TerminalChat {
 			// Maintain scroll position on resize
 			this.ui.scrollToBottom();
 		});
+		
+		// Mobile-specific improvements
+		if (window.innerWidth <= 768) {
+			// Add a slight delay to ensure UI is ready
+			setTimeout(() => {
+				// Reduce animation intensity on mobile
+				document.documentElement.style.setProperty('--scan-animation-duration', '1.2s');
+			}, 100);
+		}
 	}
 
 	/**

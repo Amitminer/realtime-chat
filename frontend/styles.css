@@ -9,6 +9,11 @@ body {
     -moz-text-size-adjust: 100%;
     -ms-text-size-adjust: 100%;
     text-size-adjust: 100%;
+    overscroll-behavior: none;
+}
+
+:root {
+    --scan-animation-duration: 0.6s;
 }
 
 .terminal-scan {
@@ -17,7 +22,7 @@ body {
         transparent 50%
     );
     background-size: 100% 4px;
-    animation: scan 0.6s linear infinite;
+    animation: scan var(--scan-animation-duration) linear infinite;
 }
 
 @keyframes scan {
@@ -89,25 +94,28 @@ body {
     }
 }
 
-/* Mobile-specific */
-@media (max-width: 640px) {
+/* Mobile-specific improvements */
+@media (max-width: 768px) {
     body {
         font-size: 14px;
+        touch-action: manipulation;
     }
     
     .terminal-border {
         border-width: 1px;
         box-shadow: 0 0 10px rgba(0, 255, 0, 0.2);
+        margin: 0.5rem;
     }
     
     #messagesContainer {
-        padding: 0.5rem;
-        font-size: 12px;
-        line-height: 1.4;
+        padding: 0.75rem;
+        font-size: 13px;
+        line-height: 1.5;
     }
     
     #messageInput {
-        font-size: 14px;
+        font-size: 16px; /* Prevents zoom on iOS */
+        padding: 0.5rem 0;
     }
     
     .terminal-scan {
@@ -123,9 +131,106 @@ body {
         background-size: 30px 30px;
     }
     
-    /* Fix for input zooming on iOS */
-    input[type="text"],
-    input[type="password"] {
-        font-size: 16px;
+    /* Input form adjustments for mobile */
+    .flex.items-center.mb-4.flex-wrap {
+        gap: 0.5rem;
+    }
+    
+    /* Adjust button sizes for better touch targets */
+    button {
+        min-height: 44px; /* Minimum touch target size */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    /* Reduce excessive padding on mobile */
+    .p-4 {
+        padding: 1rem;
+    }
+    
+    .p-2 {
+        padding: 0.5rem;
+    }
+    
+    /* Ensure proper spacing for system messages */
+    .system-message {
+        padding: 0.25rem 0;
+    }
+    
+    /* Optimize header for mobile */
+    header {
+        padding: 0.5rem;
+    }
+    
+    /* Improve error toast positioning on mobile */
+    #errorToast {
+        left: 0.5rem;
+        right: 0.5rem;
+        top: 0.5rem;
+        max-width: none;
+    }
+}
+
+/* Extra small devices */
+@media (max-width: 480px) {
+    body {
+        font-size: 13px;
+    }
+    
+    #messagesContainer {
+        font-size: 12px;
+        padding: 0.5rem;
+    }
+    
+    .terminal-border {
+        margin: 0.25rem;
+    }
+    
+    /* Further reduce padding */
+    .p-4 {
+        padding: 0.75rem;
+    }
+    
+    .p-2 {
+        padding: 0.25rem;
+    }
+}
+
+/* Large screen improvements */
+@media (min-width: 1024px) {
+    .max-w-6xl {
+        max-width: 80rem;
+    }
+}
+
+/* Touch-friendly adjustments */
+@media (hover: none) and (pointer: coarse) {
+    /* Reduce animations on touch devices */
+    .terminal-scan {
+        animation-duration: 1.2s;
+    }
+    
+    /* Larger touch targets */
+    button {
+        min-height: 48px;
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+}
+
+/* Hide scrollbar on mobile but keep functionality */
+@media (max-width: 768px) {
+    #messagesContainer::-webkit-scrollbar {
+        width: 4px;
+    }
+    
+    #messagesContainer::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.1);
+    }
+    
+    #messagesContainer::-webkit-scrollbar-thumb {
+        background: rgba(0, 255, 0, 0.3);
+        border-radius: 2px;
     }
 }
