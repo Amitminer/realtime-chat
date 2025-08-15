@@ -124,3 +124,42 @@
                 </form>
             </div>
         </div>
+
+        <!-- Loading State -->
+        <div id="loadingState" class="hidden flex-1 flex items-center justify-center">
+            <div class="text-center">
+                <div class="text-green-400 text-xl mb-4">
+                    <span class="inline-block animate-spin">⠋</span> CONNECTING TO SERVER...
+                </div>
+                <div class="text-green-600 text-sm">
+                    Establishing secure connection...
+                </div>
+            </div>
+        </div>
+
+        <!-- Authentication Loading State -->
+        <div id="authLoadingState" class="hidden flex-1 flex items-center justify-center">
+            <div class="text-center">
+                <div class="text-yellow-400 text-xl mb-4">
+                    <span class="inline-block animate-spin">⠋</span> AUTHENTICATING...
+                </div>
+                <div class="text-yellow-600 text-sm">
+                    Verifying access credentials...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Error Messages -->
+    <div id="errorToast" class="hidden fixed top-4 right-4 bg-red-900 border border-red-500 text-red-300 px-4 py-2 text-sm max-w-sm">
+        <div class="flex items-center justify-between">
+            <span class="text-red-400">[ERROR]</span>
+            <span id="errorMessage" class="ml-2 flex-1"></span>
+            <button id="closeError" class="ml-2 text-red-400 hover:text-red-300">×</button>
+        </div>
+    </div>
+
+    <script src="/config.js"></script>
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>
