@@ -40,6 +40,19 @@ class TerminalChat {
 		/** @type {UIManager} */
 		this.ui = new UIManager();
 
+		if (!window.isSecureContext || !window.crypto || !window.crypto.subtle) {
+			this.ui.showError(
+				"CRITICAL: Crypto API unavailable. Please serve the application over HTTPS or access it via localhost.",
+				true
+			);
+			this.ui.elements.passwordForm.classList.add("hidden");
+			this.ui.elements.usernameForm.classList.add("hidden");
+			this.ui.elements.messageForm.classList.add("hidden");
+			this.ui.elements.loadingState.classList.add("hidden");
+			this.ui.elements.authLoadingState.classList.add("hidden");
+			return;
+		}
+
 		this.attachEventListeners();
 		this.connect();
 		this.startTerminalEffects();

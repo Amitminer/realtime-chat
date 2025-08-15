@@ -174,10 +174,12 @@ export class UIManager {
     }
   }
 
-  showError(message) {
+  showError(message, isPersistent = false) {
     this.elements.errorMessage.textContent = message;
     this.elements.errorToast.classList.remove("hidden");
-    setTimeout(() => this.hideError(), 5000);
+    if (!isPersistent) {
+      setTimeout(() => this.hideError(), 5000);
+    }
   }
 
   hideError() {
