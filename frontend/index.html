@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
     <meta name="theme-color" content="#000000">
     <title>Terminal Chat</title>
     <link rel="preconnect" href="https://fonts.gstatic.com">
@@ -11,50 +11,57 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body class="bg-black text-green-400 h-screen overflow-hidden matrix-bg">
-    <div class="h-full flex flex-col w-full max-w-4xl mx-auto terminal-border terminal-scan">
+    <!-- Added mobile-optimized container with better responsive classes -->
+    <div class="h-full flex flex-col w-full max-w-4xl mx-auto terminal-border terminal-scan px-1 sm:px-0">
         <!-- Terminal Header -->
-        <header class="bg-black border-b-2 border-green-400 px-2 sm:px-4 py-2 flex-shrink-0">
-            <div class="flex items-center justify-between text-xs sm:text-sm flex-wrap gap-y-1">
-                <div class="flex items-center space-x-2 sm:space-x-4 min-w-0">
-                    <span class="text-yellow-400 truncate !text-xs sm:!text-sm">[ROOT@CHATROOM]</span>
-                    <span class="truncate !text-xs sm:!text-sm">~$ ./terminal-chat</span>
+        <!-- Improved header spacing and text sizing for mobile -->
+        <header class="bg-black border-b-2 border-green-400 px-2 sm:px-4 py-2 sm:py-3 flex-shrink-0">
+            <div class="flex items-center justify-between text-xs sm:text-sm flex-wrap gap-y-1 gap-x-2">
+                <div class="flex items-center space-x-2 sm:space-x-4 min-w-0 flex-1">
+                    <span class="text-yellow-400 truncate text-xs sm:text-sm font-medium">[ROOT@CHATROOM]</span>
+                    <span class="truncate text-xs sm:text-sm hidden xs:inline">~$ ./terminal-chat</span>
                 </div>
                 <div id="connectionStatus" class="flex items-center flex-shrink-0">
                     <span class="w-2 h-2 bg-red-500 rounded-full mr-2 animate-pulse"></span>
-                    <span class="text-red-400 truncate !text-xs sm:!text-sm">DISCONNECTED</span>
+                    <span class="text-red-400 truncate text-xs sm:text-sm font-medium">DISCONNECTED</span>
                 </div>
             </div>
         </header>
 
         <!-- Password Authentication -->
-        <div id="passwordSection" class="flex-1 flex items-center justify-center p-4 sm:p-8">
+        <!-- Enhanced mobile padding and touch targets -->
+        <div id="passwordSection" class="flex-1 flex items-center justify-center p-3 sm:p-8">
             <div class="w-full max-w-md">
-                <div class="terminal-border bg-black p-4 sm:p-6">
+                <div class="terminal-border bg-black p-4 sm:p-6 mx-2 sm:mx-0">
                     <div class="text-center mb-6">
-                        <div class="text-red-400 text-lg mb-2 !text-base sm:!text-lg">🔒 [SECURE CHANNEL ACCESS]</div>
-                        <div class="text-yellow-400 mb-2 !text-sm sm:!text-base">⚠️ CLASSIFIED SYSTEM</div>
-                        <div class="text-green-300 !text-sm sm:!text-base">└─$ Enter access code to proceed...</div>
+                        <div class="text-red-400 text-base sm:text-lg mb-2 font-medium">🔒 [SECURE CHANNEL ACCESS]</div>
+                        <div class="text-yellow-400 mb-2 text-sm sm:text-base">⚠️ CLASSIFIED SYSTEM</div>
+                        <div class="text-green-300 text-sm sm:text-base">└─$ Enter access code to proceed...</div>
                     </div>
                     <form id="passwordForm">
-                        <div class="flex flex-col sm:flex-row items-start sm:items-center mb-4 gap-2">
-                            <span class="text-red-500 w-full sm:w-auto mb-1 sm:mb-0 !text-sm">root@secure:~$</span>
-                            <input
-                                type="password"
-                                id="passwordInput"
-                                placeholder="••••••••••••••"
-                                class="flex-1 bg-transparent border-b border-green-600 outline-none text-green-400 placeholder-green-600 cursor-blink w-full py-2 !text-base"
-                                required
-                                autocomplete="off"
-                            >
+                        <!-- Improved mobile form layout with better spacing -->
+                        <div class="flex flex-col gap-3 mb-4">
+                            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2">
+                                <span class="text-red-500 text-sm font-medium">root@secure:~$</span>
+                                <input
+                                    type="password"
+                                    id="passwordInput"
+                                    placeholder="••••••••••••••"
+                                    class="flex-1 bg-transparent border-b-2 border-green-600 outline-none text-green-400 placeholder-green-600 cursor-blink w-full py-3 text-base font-medium focus:border-green-400 transition-colors"
+                                    required
+                                    autocomplete="off"
+                                >
+                            </div>
                         </div>
-                        <button id="passwordSubmit" type="submit" class="w-full bg-red-900 text-red-300 py-3 px-4 border border-red-500 hover:bg-red-800 transition-colors !text-base sm:!text-lg font-medium">
+                        <!-- Enhanced button with better mobile touch target -->
+                        <button id="passwordSubmit" type="submit" class="w-full bg-red-900 text-red-300 py-4 px-4 border-2 border-red-500 hover:bg-red-800 active:bg-red-700 transition-colors text-base sm:text-lg font-medium min-h-[48px] touch-manipulation">
                             [ENTER] AUTHENTICATE ACCESS
                         </button>
                         <div class="text-xs text-green-600 mt-3 text-center">
                             * Unauthorized access will be logged and tracked *
                         </div>
                     </form>
-                    <div id="authError" class="hidden mt-4 text-red-400 text-sm text-center">
+                    <div id="authError" class="hidden mt-4 text-red-400 text-sm text-center font-medium">
                         ❌ ACCESS DENIED - Invalid credentials
                     </div>
                 </div>
@@ -62,28 +69,33 @@
         </div>
 
         <!-- Username Setup -->
-        <div id="usernameSection" class="hidden flex-1 flex items-center justify-center p-4 sm:p-8">
+        <!-- Enhanced mobile padding and touch targets -->
+        <div id="usernameSection" class="hidden flex-1 flex items-center justify-center p-3 sm:p-8">
             <div class="w-full max-w-md">
-                <div class="terminal-border bg-black p-4 sm:p-6">
+                <div class="terminal-border bg-black p-4 sm:p-6 mx-2 sm:mx-0">
                     <div class="text-center mb-6">
-                        <div class="text-green-400 text-lg mb-2 !text-base sm:!text-lg">✅ [ACCESS GRANTED]</div>
-                        <div class="text-yellow-400 mb-2 !text-sm sm:!text-base">┌─[USER IDENTIFICATION]</div>
-                        <div class="text-green-300 !text-sm sm:!text-base">└─$ Set your handle for secure comms...</div>
+                        <div class="text-green-400 text-base sm:text-lg mb-2 font-medium">✅ [ACCESS GRANTED]</div>
+                        <div class="text-yellow-400 mb-2 text-sm sm:text-base">┌─[USER IDENTIFICATION]</div>
+                        <div class="text-green-300 text-sm sm:text-base">└─$ Set your handle for secure comms...</div>
                     </div>
                     <form id="usernameForm">
-                        <div class="flex flex-col sm:flex-row items-start sm:items-center mb-4 gap-2">
-                            <span class="text-green-500 w-full sm:w-auto mb-1 sm:mb-0 !text-sm">user@terminal:~$</span>
-                            <input
-                                type="text"
-                                id="usernameInput"
-                                placeholder=""
-                                maxlength="20"
-                                class="flex-1 bg-transparent border-b border-green-600 outline-none text-green-400 placeholder-green-600 cursor-blink w-full py-2 !text-base"
-                                required
-                                autocomplete="off"
-                            >
+                        <!-- Improved mobile form layout -->
+                        <div class="flex flex-col gap-3 mb-4">
+                            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2">
+                                <span class="text-green-500 text-sm font-medium">user@terminal:~$</span>
+                                <input
+                                    type="text"
+                                    id="usernameInput"
+                                    placeholder=""
+                                    maxlength="20"
+                                    class="flex-1 bg-transparent border-b-2 border-green-600 outline-none text-green-400 placeholder-green-600 cursor-blink w-full py-3 text-base font-medium focus:border-green-400 transition-colors"
+                                    required
+                                    autocomplete="off"
+                                >
+                            </div>
                         </div>
-                        <button type="submit" class="w-full bg-green-900 text-green-300 py-3 px-4 border border-green-500 hover:bg-green-800 transition-colors !text-base sm:!text-lg font-medium">
+                        <!-- Enhanced button with better mobile touch target -->
+                        <button type="submit" class="w-full bg-green-900 text-green-300 py-4 px-4 border-2 border-green-500 hover:bg-green-800 active:bg-green-700 transition-colors text-base sm:text-lg font-medium min-h-[48px] touch-manipulation">
                             [ENTER] SET IDENTITY
                         </button>
                     </form>
@@ -94,30 +106,33 @@
         <!-- Chat Interface -->
         <div id="chatInterface" class="hidden flex-1 min-h-0 flex flex-col">
             <!-- Messages Container -->
-            <div id="messagesContainer" class="flex-1 overflow-y-auto p-2 sm:p-4 scrollbar-hide text-xs sm:text-sm leading-relaxed">
+            <!-- Improved mobile scrolling and padding -->
+            <div id="messagesContainer" class="flex-1 overflow-y-auto p-3 sm:p-4 scrollbar-hide text-sm sm:text-base leading-relaxed overscroll-contain">
                 <div class="system-message text-yellow-400 mb-2">Terminal initialized... Connecting to secure channel...</div>
                 <div class="system-message text-yellow-400 mb-4">Type /help for available commands</div>
             </div>
 
             <!-- Input Area -->
-            <div class="border-t-2 border-green-400 bg-black p-2 sm:p-4 flex-shrink-0">
+            <!-- Enhanced mobile input area with better touch targets -->
+            <div class="border-t-2 border-green-400 bg-black p-3 sm:p-4 flex-shrink-0 safe-area-inset-bottom">
                 <form id="messageForm" class="flex items-center gap-2">
-                    <span class="text-green-500 mr-1 sm:mr-2 hidden sm:inline !text-sm sm:!text-base" id="promptPrefix">guest@chat:~$</span>
+                    <span class="text-green-500 text-sm sm:text-base font-medium hidden sm:inline flex-shrink-0" id="promptPrefix">guest@chat:~$</span>
                     <input
                         type="text"
                         id="messageInput"
                         placeholder=""
                         maxlength="500"
-                        class="min-w-0 flex-1 bg-transparent border-none outline-none text-green-400 placeholder-green-600 w-full !text-base"
+                        class="min-w-0 flex-1 bg-transparent border-none outline-none text-green-400 placeholder-green-600 text-base py-2 font-medium"
                         required
                         autocomplete="off"
                     >
                     <span class="cursor-blink ml-1 hidden sm:inline"></span>
+                    <!-- Improved mobile send button -->
                     <button
                       type="submit"
                       id="sendButton"
                       aria-label="Send message"
-                      class="ml-1 sm:ml-2 bg-green-900 text-green-300 py-2 px-3 border border-green-500 hover:bg-green-800 transition-colors flex-shrink-0 !text-xs sm:!text-base min-w-[60px] sm:min-w-[80px]"
+                      class="ml-2 bg-green-900 text-green-300 py-3 px-4 border-2 border-green-500 hover:bg-green-800 active:bg-green-700 transition-colors flex-shrink-0 text-sm sm:text-base font-medium min-w-[70px] sm:min-w-[80px] min-h-[44px] touch-manipulation"
                     >
                       [SEND]
                     </button>
@@ -151,11 +166,12 @@
     </div>
 
     <!-- Error Messages -->
-    <div id="errorToast" class="hidden fixed top-4 right-4 bg-red-900 border border-red-500 text-red-300 px-4 py-2 text-sm max-w-sm">
+    <!-- Improved mobile error toast positioning -->
+    <div id="errorToast" class="hidden fixed top-4 left-4 right-4 sm:top-4 sm:right-4 sm:left-auto bg-red-900 border-2 border-red-500 text-red-300 px-4 py-3 text-sm max-w-sm sm:max-w-md mx-auto sm:mx-0 z-50">
         <div class="flex items-center justify-between">
-            <span class="text-red-400">[ERROR]</span>
+            <span class="text-red-400 font-medium">[ERROR]</span>
             <span id="errorMessage" class="ml-2 flex-1"></span>
-            <button id="closeError" class="ml-2 text-red-400 hover:text-red-300">×</button>
+            <button id="closeError" class="ml-2 text-red-400 hover:text-red-300 text-lg leading-none min-w-[24px] min-h-[24px] flex items-center justify-center">×</button>
         </div>
     </div>
 
