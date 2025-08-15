@@ -147,7 +147,7 @@ body {
   }
 }
 
-/* Added overlay styles and improved mobile experience */
+/* Added overlay styles for mobile input */
 #inputOverlay.show {
   transform: translateY(0);
 }
