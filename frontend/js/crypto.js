@@ -1,28 +1,48 @@
 /**
  * Cryptography helpers using Web Crypto API.
- * Implements AES-GCM with a key derived via SHA-256(password),
+ * Implements AES-GCM with a key derived via PBKDF2(password),
  * matching the server's symmetric scheme.
  */
 
 import { arrayBufferToBase64, base64ToArrayBuffer } from "./utils.js";
 
 /**
- * Derive an AES-GCM CryptoKey from a plain-text password using SHA-256.
+ * Derive an AES-GCM CryptoKey from a plain-text password using PBKDF2.
  * @param {string} password
  * @returns {Promise<CryptoKey>}
  */
 export async function deriveKeyFromPassword(password) {
   const encoder = new TextEncoder();
   const passwordData = encoder.encode(password);
-  const hashBuffer = await crypto.subtle.digest("SHA-256", passwordData);
-
-  return crypto.subtle.importKey(
+  
+  // Use a fixed salt for compatibility with server
+  // In a production environment, this should be randomly generated and stored
+  const salt = new Uint8Array(16);
+  salt.fill(0x42); // Fixed salt - not ideal but matches our simplified approach
+  
+  // Derive key using PBKDF2
+  const keyMaterial = await crypto.subtle.importKey(
     "raw",
-    hashBuffer,
-    { name: "AES-GCM" },
+    passwordData,
+    { name: "PBKDF2" },
     false,
+    ["deriveKey"]
+  );
+  
+  const key = await crypto.subtle.deriveKey(
+    {
+      name: "PBKDF2",
+      salt: salt,
+      iterations: 100000,
+      hash: "SHA-256",
+    },
+    keyMaterial,
+    { name: "AES-GCM", length: 256 },
+    true,
     ["encrypt", "decrypt"]
   );
+  
+  return key;
 }
 
 /**

@@ -1,0 +1,44 @@
+name: Lint Check
+
+on:
+  push:
+    branches: [dev, pre]
+  pull_request:
+    branches: [dev, pre]
+
+jobs:
+  lint-backend:
+    name: 🦀 Lint Rust (Clippy)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+
+      - name: Run Clippy
+        run: cargo clippy --all-targets --all-features -- -D warnings
+
+  lint-http-serve:
+    name: 🚀 Lint HTTP Server
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: http-server
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+
+      - name: Run Clippy
+        run: cargo clippy --all-targets --all-features -- -D warnings

@@ -7,6 +7,7 @@
 //! - `BIND_ADDR` (optional; overrides host/port)
 //! - `SERVER_PASSWORD` (required)
 use std::env;
+use std::io::{Error, ErrorKind};
 
 /// In-memory representation of server configuration.
 #[derive(Clone, Debug)]
@@ -39,9 +40,13 @@ impl Config {
 
         // SERVER_PASSWORD must be present and non-empty
         let server_password = env::var("SERVER_PASSWORD")
-            .ok()
-            .filter(|v| !v.is_empty())
-            .ok_or("SERVER_PASSWORD is required. Set it in environment or .env")?;
+            .map_err(|e| Box::new(e) as Box<dyn std::error::Error>)?;
+        if server_password.is_empty() {
+            return Err(Box::new(Error::new(
+                ErrorKind::InvalidInput,
+                "SERVER_PASSWORD cannot be empty",
+            )));
+        }
 
         Ok(Self { bind_addr, server_password })
     }

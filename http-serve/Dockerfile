@@ -1,5 +1,5 @@
 # Build stage (use slim image with 2024 edition support)
-FROM rust:1.85-slim as builder
+FROM rust:1.85-slim AS builder
 WORKDIR /app
 
 # Copy the full crate to avoid "dummy main" caching pitfalls

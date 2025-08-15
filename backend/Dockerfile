@@ -1,13 +1,16 @@
 # Build stage (use slim image with 2024 edition support)
 FROM rust:1.85-slim AS builder
 WORKDIR /app
-COPY backend/Cargo.* ./
+COPY backend/Cargo.toml ./
+COPY Cargo.lock ./
+# Create a dummy file to let cargo fetch dependencies
+RUN mkdir -p src && echo "fn main() {}" > src/main.rs
 # Fetch deps first to cache them
-RUN cargo fetch --locked
+RUN cargo fetch
 # Now copy real sources
 COPY backend/src ./src
 # Build with cached deps
-RUN cargo build --release --locked
+RUN cargo build --release
 
 # Runtime stage (Debian slim)
 FROM debian:bookworm-slim

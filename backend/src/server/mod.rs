@@ -31,7 +31,16 @@ pub async fn run_server(config: Config) -> Result<(), Box<dyn std::error::Error>
     };
 
     let peer_map: PeerMap = Arc::new(RwLock::new(HashMap::new()));
-    let encryption_manager = Arc::new(EncryptionManager::new(&config.server_password));
+
+    // Create encryption manager with proper error handling
+    let encryption_manager: Arc<EncryptionManager> =
+        match EncryptionManager::new(&config.server_password) {
+            Ok(manager) => Arc::new(manager),
+            Err(e) => {
+                eprintln!("❌ Failed to initialize encryption manager: {e}");
+                return Err(e);
+            }
+        };
 
     println!("👂 Listening for encrypted connections...");
 
@@ -49,9 +58,7 @@ pub async fn run_server(config: Config) -> Result<(), Box<dyn std::error::Error>
                 let password = config.server_password.clone();
                 tokio::spawn(async move {
                     handle_connection(peer_map_clone, stream, addr, enc_clone, &password).await;
-                    println!(
-                        "[DEBUG] 🏁 Encrypted connection handler finished for: {addr}"
-                    );
+                    println!("[DEBUG] 🏁 Encrypted connection handler finished for: {addr}");
                 });
             }
             Err(e) => {
@@ -148,10 +155,10 @@ async fn handle_connection(
             }
 
             // Username join
-            if let Ok(join) = serde_json::from_str::<UserJoin>(text)
-                && join.message_type == "join" {
+            if let Ok(join) = serde_json::from_str::<UserJoin>(text) {
+                if join.message_type == "join" {
                     username = join.username;
-                    let (encrypted_message, nonce) = match encryption_manager
+                    let (encrypted_message, nonce, _salt) = match encryption_manager
                         .as_ref()
                         .encrypt_message(&format!("{username} joined the chat"))
                     {
@@ -169,6 +176,7 @@ async fn handle_connection(
                     let _ = broadcast_encrypted_message(&peer_map, &msg).await;
                     continue;
                 }
+            }
 
             // Encrypted message
             if let Ok(mut enc_msg) = serde_json::from_str::<EncryptedChatMessage>(text) {
@@ -178,7 +186,7 @@ async fn handle_connection(
                 enc_msg.message_type = "message".into();
                 let _ = broadcast_encrypted_message(&peer_map, &enc_msg).await;
             } else if let Ok(chat_msg) = serde_json::from_str::<ChatMessage>(text) {
-                let (encrypted_message, nonce) = match encryption_manager
+                let (encrypted_message, nonce, _salt) = match encryption_manager
                     .as_ref()
                     .encrypt_message(&chat_msg.message)
                 {
@@ -195,7 +203,7 @@ async fn handle_connection(
                 };
                 let _ = broadcast_encrypted_message(&peer_map, &enc_msg).await;
             } else {
-                let (encrypted_message, nonce) =
+                let (encrypted_message, nonce, _salt) =
                     match encryption_manager.as_ref().encrypt_message(text) {
                         Ok(v) => v,
                         Err(_) => continue,
@@ -215,8 +223,8 @@ async fn handle_connection(
         }
     }
 
-    if is_authenticated
-        && let Ok((encrypted_message, nonce)) = encryption_manager
+    if is_authenticated {
+        if let Ok((encrypted_message, nonce, _salt)) = encryption_manager
             .as_ref()
             .encrypt_message(&format!("{username} left the chat"))
         {
@@ -230,6 +238,7 @@ async fn handle_connection(
             };
             let _ = broadcast_encrypted_message(&peer_map, &leave_msg).await;
         }
+    }
 
     let mut peers = peer_map.write().await;
     peers.remove(&user_id);
