@@ -145,6 +145,37 @@ class TerminalChat {
       this.ui.hideError()
     })
 
+    const composeButton = document.getElementById("composeButton")
+    const inputOverlay = document.getElementById("inputOverlay")
+    const closeOverlay = document.getElementById("closeOverlay")
+
+    if (composeButton) {
+      composeButton.addEventListener("click", () => {
+        this.showInputOverlay()
+      })
+    }
+
+    if (closeOverlay) {
+      closeOverlay.addEventListener("click", () => {
+        this.hideInputOverlay()
+      })
+    }
+
+    this.ui.elements.messageInput.addEventListener("focus", () => {
+      if (this.isMobile) {
+        this.showInputOverlay()
+        // Scroll to bottom when input is focused on mobile
+        setTimeout(() => {
+          this.ui.scrollToBottom()
+          // Ensure input is visible above keyboard
+          this.ui.elements.messageInput.scrollIntoView({
+            behavior: "smooth",
+            block: "center",
+          })
+        }, 300)
+      }
+    })
+
     this.ui.elements.messageInput.addEventListener("keydown", (e) => {
       if (e.key === "Tab") {
         e.preventDefault()
@@ -164,20 +195,9 @@ class TerminalChat {
           this.historyIndex = -1
           this.ui.elements.messageInput.value = ""
         }
-      }
-    })
-
-    this.ui.elements.messageInput.addEventListener("focus", () => {
-      if (this.isMobile) {
-        // Scroll to bottom when input is focused on mobile
-        setTimeout(() => {
-          this.ui.scrollToBottom()
-          // Ensure input is visible above keyboard
-          this.ui.elements.messageInput.scrollIntoView({
-            behavior: "smooth",
-            block: "center",
-          })
-        }, 300)
+      } else if (e.key === "Escape" && this.isMobile) {
+        e.preventDefault()
+        this.hideInputOverlay()
       }
     })
 
@@ -195,7 +215,12 @@ class TerminalChat {
       clearTimeout(resizeTimeout)
       resizeTimeout = setTimeout(() => {
         // Update mobile detection on resize
+        const wasMobile = this.isMobile
         this.isMobile = this.detectMobile()
+
+        if (wasMobile && !this.isMobile) {
+          this.hideInputOverlay()
+        }
 
         // Maintain scroll position on resize
         this.ui.scrollToBottom()
@@ -233,6 +258,25 @@ class TerminalChat {
           navigator.vibrate(10) // Very short vibration
         }
       })
+    }
+  }
+
+  showInputOverlay() {
+    const inputOverlay = document.getElementById("inputOverlay")
+    if (inputOverlay && this.isMobile) {
+      inputOverlay.classList.add("show")
+      // Focus input after animation
+      setTimeout(() => {
+        this.ui.elements.messageInput.focus()
+      }, 300)
+    }
+  }
+
+  hideInputOverlay() {
+    const inputOverlay = document.getElementById("inputOverlay")
+    if (inputOverlay && this.isMobile) {
+      inputOverlay.classList.remove("show")
+      this.ui.elements.messageInput.blur()
     }
   }
 
@@ -527,6 +571,9 @@ class TerminalChat {
     if (message.startsWith("/")) {
       this.handleCommand(message)
       this.ui.elements.messageInput.value = ""
+      if (this.isMobile) {
+        this.hideInputOverlay()
+      }
       return
     }
 
@@ -560,6 +607,9 @@ class TerminalChat {
       )
 
       this.ui.elements.messageInput.value = ""
+      if (this.isMobile) {
+        this.hideInputOverlay()
+      }
     } catch (error) {
       console.error("Send failed:", error)
       this.ui.showError("Message send failed")
