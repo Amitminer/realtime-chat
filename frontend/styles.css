@@ -88,7 +88,12 @@ body {
   background-size: 40px 40px;
 }
 
-/* Simplified mobile styles and removed redundant CSS */
+/* Enhanced safe area support for mobile devices */
+.pb-safe {
+  padding-bottom: max(1.5rem, env(safe-area-inset-bottom, 1.5rem));
+}
+
+/* Cleaned up mobile styles */
 @media (max-width: 768px) {
   .terminal-border {
     border-width: 1px;
@@ -101,7 +106,7 @@ body {
   }
 
   #messageInput {
-    font-size: 16px; /* Prevents zoom on iOS */
+    font-size: 16px;
   }
 
   .matrix-bg {
@@ -109,7 +114,7 @@ body {
   }
 
   button {
-    min-height: 40px;
+    min-height: 44px;
     touch-action: manipulation;
     -webkit-tap-highlight-color: rgba(0, 255, 0, 0.1);
   }
@@ -118,16 +123,6 @@ body {
     transform: scale(0.98);
     transition: transform 0.1s ease;
   }
-
-  /* Added extra bottom padding for mobile input to avoid navigation bar */
-  #messageForm {
-    padding-bottom: max(1.5rem, env(safe-area-inset-bottom, 1.5rem));
-  }
-}
-
-/* Enhanced safe area support for devices with notches and navigation bars */
-.pb-safe {
-  padding-bottom: max(1rem, env(safe-area-inset-bottom, 1rem));
 }
 
 @media (max-width: 480px) {

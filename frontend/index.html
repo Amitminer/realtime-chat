@@ -11,10 +11,10 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body class="bg-black text-green-400 matrix-bg h-screen overflow-hidden">
-    <!-- Simplified container structure with proper height management -->
+    <!-- Fixed container structure with proper topbar visibility -->
     <div class="h-screen flex flex-col w-full max-w-3xl mx-auto terminal-border terminal-scan">
-        <!-- Compact title bar -->
-        <header class="bg-black border-b border-green-400 px-4 py-3 flex-shrink-0 relative z-10">
+        <!-- Always visible topbar with proper z-index -->
+        <header class="bg-black border-b border-green-400 px-4 py-3 flex-shrink-0 relative z-50">
             <div class="flex items-center justify-between text-sm">
                 <span class="text-yellow-400 font-medium">TERMINAL CHAT</span>
                 <div id="connectionStatus" class="flex items-center">
@@ -25,7 +25,6 @@
         </header>
 
         <!-- Password Authentication -->
-        <!-- Enhanced mobile padding and touch targets -->
         <div id="passwordSection" class="flex-1 flex items-center justify-center p-8">
             <div class="w-full max-w-md">
                 <div class="terminal-border bg-black p-4 sm:p-6 mx-2 sm:mx-0">
@@ -35,7 +34,6 @@
                         <div class="text-green-300 text-sm sm:text-base">└─$ Enter access code to proceed...</div>
                     </div>
                     <form id="passwordForm">
-                        <!-- Improved mobile form layout with better spacing -->
                         <div class="flex flex-col gap-3 mb-4">
                             <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2">
                                 <span class="text-red-500 text-sm font-medium">root@secure:~$</span>
@@ -49,7 +47,6 @@
                                 >
                             </div>
                         </div>
-                        <!-- Enhanced button with better mobile touch target -->
                         <button id="passwordSubmit" type="submit" class="w-full bg-red-900 text-red-300 py-4 px-4 border-2 border-red-500 hover:bg-red-800 active:bg-red-700 transition-colors text-base sm:text-lg font-medium min-h-[48px] touch-manipulation">
                             [ENTER] AUTHENTICATE ACCESS
                         </button>
@@ -65,7 +62,6 @@
         </div>
 
         <!-- Username Setup -->
-        <!-- Enhanced mobile padding and touch targets -->
         <div id="usernameSection" class="hidden flex-1 flex items-center justify-center p-8">
             <div class="w-full max-w-md">
                 <div class="terminal-border bg-black p-4 sm:p-6 mx-2 sm:mx-0">
@@ -75,7 +71,6 @@
                         <div class="text-green-300 text-sm sm:text-base">└─$ Set your handle for secure comms...</div>
                     </div>
                     <form id="usernameForm">
-                        <!-- Improved mobile form layout -->
                         <div class="flex flex-col gap-3 mb-4">
                             <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2">
                                 <span class="text-green-500 text-sm font-medium">user@terminal:~$</span>
@@ -90,7 +85,6 @@
                                 >
                             </div>
                         </div>
-                        <!-- Enhanced button with better mobile touch target -->
                         <button type="submit" class="w-full bg-green-900 text-green-300 py-4 px-4 border-2 border-green-500 hover:bg-green-800 active:bg-green-700 transition-colors text-base sm:text-lg font-medium min-h-[48px] touch-manipulation">
                             [ENTER] SET IDENTITY
                         </button>
@@ -100,17 +94,16 @@
         </div>
 
         <!-- Chat Interface -->
-        <!-- Simplified chat interface without overlay complexity -->
         <div id="chatInterface" class="hidden flex-1 flex flex-col min-h-0">
-            <!-- Messages Container - takes available space above input -->
+            <!-- Messages Container -->
             <div id="messagesContainer" class="flex-1 overflow-y-auto p-4 scrollbar-thin text-sm leading-relaxed">
                 <div class="system-message text-yellow-400 mb-2">Terminal initialized... Connecting to secure channel...</div>
                 <div class="system-message text-yellow-400 mb-4">Type /help for available commands</div>
             </div>
             
-            <!-- Simple fixed input at bottom - no overlay -->
-            <div class="border-t-2 border-green-400 bg-black flex-shrink-0 pb-safe">
-                <form id="messageForm" class="flex items-center gap-3 p-4 pb-6">
+            <!-- Fixed input positioning with proper safe area padding -->
+            <div class="border-t-2 border-green-400 bg-black flex-shrink-0">
+                <form id="messageForm" class="flex items-center gap-3 p-4 pb-safe">
                     <div class="flex-1 flex items-center min-w-0">
                         <span class="text-green-500 text-sm font-medium hidden sm:inline flex-shrink-0 mr-3" id="promptPrefix">guest@chat:~$</span>
                         <input
@@ -161,7 +154,6 @@
     </div>
 
     <!-- Error Messages -->
-    <!-- Improved mobile error toast positioning -->
     <div id="errorToast" class="hidden fixed top-4 left-4 right-4 sm:top-4 sm:right-4 sm:left-auto bg-red-900 border-2 border-red-500 text-red-300 px-4 py-3 text-sm max-w-sm sm:max-w-md mx-auto sm:mx-0 z-50">
         <div class="flex items-center justify-between">
             <span class="text-red-400 font-medium">[ERROR]</span>
