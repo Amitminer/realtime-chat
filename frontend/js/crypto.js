@@ -12,37 +12,37 @@ import { arrayBufferToBase64, base64ToArrayBuffer } from "./utils.js";
  * @returns {Promise<CryptoKey>}
  */
 export async function deriveKeyFromPassword(password) {
-  const encoder = new TextEncoder();
-  const passwordData = encoder.encode(password);
-  
-  // Use a fixed salt for compatibility with server
-  // In a production environment, this should be randomly generated and stored
-  const salt = new Uint8Array(16);
-  salt.fill(0x42); // Fixed salt - not ideal but matches our simplified approach
-  
-  // Derive key using PBKDF2
-  const keyMaterial = await crypto.subtle.importKey(
-    "raw",
-    passwordData,
-    { name: "PBKDF2" },
-    false,
-    ["deriveKey"]
-  );
-  
-  const key = await crypto.subtle.deriveKey(
-    {
-      name: "PBKDF2",
-      salt: salt,
-      iterations: 100000,
-      hash: "SHA-256",
-    },
-    keyMaterial,
-    { name: "AES-GCM", length: 256 },
-    true,
-    ["encrypt", "decrypt"]
-  );
-  
-  return key;
+	const encoder = new TextEncoder();
+	const passwordData = encoder.encode(password);
+
+	// Use a fixed salt for compatibility with server
+	// TODO: Use a secure random salt for each user
+	const salt = new Uint8Array(16);
+	salt.fill(0x42); // Fixed salt - not ideal but matches our simplified approach
+
+	// Derive key using PBKDF2
+	const keyMaterial = await crypto.subtle.importKey(
+		"raw",
+		passwordData,
+		{ name: "PBKDF2" },
+		false,
+		["deriveKey"]
+	);
+
+	const key = await crypto.subtle.deriveKey(
+		{
+			name: "PBKDF2",
+			salt: salt,
+			iterations: 100000,
+			hash: "SHA-256",
+		},
+		keyMaterial,
+		{ name: "AES-GCM", length: 256 },
+		true,
+		["encrypt", "decrypt"]
+	);
+
+	return key;
 }
 
 /**
@@ -52,20 +52,20 @@ export async function deriveKeyFromPassword(password) {
  * @returns {Promise<{ encrypted_message: string, nonce: string }>} Base64 values
  */
 export async function encryptWithKey(key, plaintext) {
-  const nonce = crypto.getRandomValues(new Uint8Array(12));
-  const encoder = new TextEncoder();
-  const plaintextBuffer = encoder.encode(plaintext);
+	const nonce = crypto.getRandomValues(new Uint8Array(12));
+	const encoder = new TextEncoder();
+	const plaintextBuffer = encoder.encode(plaintext);
 
-  const encrypted = await crypto.subtle.encrypt(
-    { name: "AES-GCM", iv: nonce },
-    key,
-    plaintextBuffer
-  );
+	const encrypted = await crypto.subtle.encrypt(
+		{ name: "AES-GCM", iv: nonce },
+		key,
+		plaintextBuffer
+	);
 
-  return {
-    encrypted_message: arrayBufferToBase64(encrypted),
-    nonce: arrayBufferToBase64(nonce),
-  };
+	return {
+		encrypted_message: arrayBufferToBase64(encrypted),
+		nonce: arrayBufferToBase64(nonce),
+	};
 }
 
 /**
@@ -76,15 +76,15 @@ export async function encryptWithKey(key, plaintext) {
  * @returns {Promise<string>} Decrypted UTF-8 text
  */
 export async function decryptWithKey(key, encryptedB64, nonceB64) {
-  const encrypted = base64ToArrayBuffer(encryptedB64);
-  const nonce = base64ToArrayBuffer(nonceB64);
+	const encrypted = base64ToArrayBuffer(encryptedB64);
+	const nonce = base64ToArrayBuffer(nonceB64);
 
-  const decrypted = await crypto.subtle.decrypt(
-    { name: "AES-GCM", iv: nonce },
-    key,
-    encrypted
-  );
+	const decrypted = await crypto.subtle.decrypt(
+		{ name: "AES-GCM", iv: nonce },
+		key,
+		encrypted
+	);
 
-  const decoder = new TextDecoder();
-  return decoder.decode(decrypted);
+	const decoder = new TextDecoder();
+	return decoder.decode(decrypted);
 }

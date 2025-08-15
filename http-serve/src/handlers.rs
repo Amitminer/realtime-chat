@@ -8,7 +8,7 @@ use std::path::Path;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 pub fn handle_connection(mut stream: TcpStream, config: ServerConfig) {
-    // Increased buffer size to handle large HTTP headers
+    // Buffer size to handle large HTTP headers
     const BUFFER_SIZE: usize = 8192;
     const MAX_HEADER_SIZE: usize = 32768; // Maximum header size we'll accept
 
@@ -21,7 +21,6 @@ pub fn handle_connection(mut stream: TcpStream, config: ServerConfig) {
         match stream.read(&mut temp_buf) {
             Ok(0) => break, // Connection closed
             Ok(bytes_read) => {
-                // Add the newly read bytes to our buffer
                 buffer.extend_from_slice(&temp_buf[..bytes_read]);
 
                 // Check if we've found the end of headers

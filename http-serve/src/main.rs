@@ -60,7 +60,7 @@ fn print_usage() {
 /// 3. Starts the HTTP server
 fn main() {
     let args: Vec<String> = std::env::args().collect();
-    
+
     // Check for help flags
     if args.iter().any(|arg| arg == "--help" || arg == "-h") {
         print_usage();

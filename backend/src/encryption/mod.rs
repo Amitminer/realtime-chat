@@ -12,9 +12,9 @@ use aes_gcm::{
     Aes256Gcm,
     aead::{Aead, AeadCore, KeyInit, OsRng},
 };
+use base64::{Engine as _, engine::general_purpose};
 use pbkdf2::pbkdf2_hmac;
 use sha2::Sha256;
-use base64::{Engine as _, engine::general_purpose};
 
 /// High-level encryptor that encapsulates key derivation and AES-GCM usage.
 ///
@@ -43,13 +43,16 @@ impl EncryptionManager {
         // Use a fixed salt for compatibility with client-side implementation
         // In a production environment, this should be randomly generated and stored
         let salt: [u8; 16] = [0x42; 16]; // Fixed salt
-        
+
         // Derive key using PBKDF2
         let mut key = [0u8; 32];
         pbkdf2_hmac::<Sha256>(password.as_bytes(), &salt, 100000, &mut key);
-        
-        let cipher = Aes256Gcm::new_from_slice(&key)
-            .map_err(|e| Box::<dyn std::error::Error + Send + Sync>::from(format!("Failed to create cipher: {e}")))?;
+
+        let cipher = Aes256Gcm::new_from_slice(&key).map_err(|e| {
+            Box::<dyn std::error::Error + Send + Sync>::from(format!(
+                "Failed to create cipher: {e}"
+            ))
+        })?;
 
         Ok(Self { cipher })
     }
@@ -76,11 +79,12 @@ impl EncryptionManager {
         let ciphertext = self
             .cipher
             .encrypt(&nonce, plaintext.as_bytes())
-            .map_err(|e| Box::<dyn std::error::Error + Send + Sync>::from(format!("Encryption failed: {e}")))?;
+            .map_err(|e| {
+                Box::<dyn std::error::Error + Send + Sync>::from(format!("Encryption failed: {e}"))
+            })?;
 
         let encrypted_b64 = general_purpose::STANDARD.encode(&ciphertext);
         let nonce_b64 = general_purpose::STANDARD.encode(nonce);
-        // For compatibility, we're not using salt in the return value anymore
         let salt_b64 = general_purpose::STANDARD.encode([0x42; 16]); // Fixed salt
 
         Ok((encrypted_b64, nonce_b64, salt_b64))
