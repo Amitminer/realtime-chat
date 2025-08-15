@@ -73,6 +73,11 @@ body {
     background-size: 50px 50px;
 }
 
+/* Fix for input field sizing */
+#messageInput {
+    min-width: 100px;
+}
+
 @media (prefers-reduced-motion: reduce) {
     .terminal-scan,
     .cursor-blink::after,
