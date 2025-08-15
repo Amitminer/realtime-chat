@@ -6,11 +6,7 @@ body {
   background: #0a0a0a;
   color: #00ff00;
   -webkit-text-size-adjust: 100%;
-  -moz-text-size-adjust: 100%;
-  -ms-text-size-adjust: 100%;
-  text-size-adjust: 100%;
   overscroll-behavior: none;
-  /* Added touch-action for better mobile performance */
   touch-action: manipulation;
 }
 
@@ -54,10 +50,6 @@ body {
   box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
 }
 
-#messageInput {
-  min-width: 100px;
-}
-
 .message-slide::before {
   content: "> ";
   color: #00aa00;
@@ -68,28 +60,26 @@ body {
   color: #ffff00;
 }
 
-.scrollbar-hide {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 255, 0, 0.4) transparent;
 }
 
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;
+.scrollbar-thin::-webkit-scrollbar {
+  width: 4px;
 }
 
-.typing-effect {
-  animation: typing 0.5s steps(20, end);
-  overflow: hidden;
-  white-space: nowrap;
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
 }
 
-@keyframes typing {
-  from {
-    width: 0;
-  }
-  to {
-    width: 100%;
-  }
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: rgba(0, 255, 0, 0.4);
+  border-radius: 2px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 255, 0, 0.6);
 }
 
 .matrix-bg {
@@ -98,11 +88,9 @@ body {
   background-size: 50px 50px;
 }
 
-/* Enhanced mobile-specific improvements with better breakpoints */
 @media (max-width: 768px) {
   body {
     font-size: 14px;
-    touch-action: manipulation;
   }
 
   .terminal-border {
@@ -114,70 +102,42 @@ body {
     padding: 0.75rem;
     font-size: 14px;
     line-height: 1.6;
-    /* Better mobile scrolling */
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: contain;
+    padding-bottom: 1rem;
   }
 
   #messageInput {
-    font-size: 16px; /* Prevents zoom on iOS */
+    font-size: 16px;
     padding: 0.75rem 0;
-    line-height: 1.4;
   }
 
   .terminal-scan {
     background-size: 100% 3px;
-    /* Reduced animation intensity on mobile */
     --scan-animation-duration: 1.2s;
-  }
-
-  @keyframes scan {
-    0% {
-      background-position: 0 0;
-    }
-    100% {
-      background-position: 0 3px;
-    }
   }
 
   .matrix-bg {
     background-size: 30px 30px;
   }
 
-  /* Enhanced button touch targets */
   button {
-    min-height: 48px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    min-height: 44px;
     touch-action: manipulation;
     -webkit-tap-highlight-color: rgba(0, 255, 0, 0.1);
   }
 
-  /* Better form spacing on mobile */
-  form {
-    gap: 1rem;
+  button:active {
+    transform: scale(0.98);
+    transition: transform 0.1s ease;
   }
 
-  /* Improved input focus behavior */
-  input:focus {
-    transform: none;
-    -webkit-transform: none;
-  }
-
-  /* Better error toast on mobile */
   #errorToast {
     border-radius: 4px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
   }
-
-  /* Safe area support for devices with notches */
-  .safe-area-inset-bottom {
-    padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
-  }
 }
 
-/* Enhanced extra small devices support */
 @media (max-width: 480px) {
   body {
     font-size: 13px;
@@ -189,123 +149,50 @@ body {
     line-height: 1.5;
   }
 
-  .terminal-border {
-    border-width: 1px;
-    box-shadow: 0 0 8px rgba(0, 255, 0, 0.15);
-  }
-
-  /* More compact spacing on very small screens */
-  header {
-    padding: 0.5rem;
-  }
-
   .matrix-bg {
     background-size: 25px 25px;
   }
 
-  /* Ensure minimum touch targets */
   button {
     min-height: 44px;
     font-size: 14px;
   }
 
   input {
-    font-size: 16px; /* Prevent zoom */
+    font-size: 16px;
     padding: 0.5rem 0;
   }
 }
 
-/* Added extra small breakpoint for better responsive design */
 @media (max-width: 375px) {
   .xs\:inline {
     display: inline;
   }
 }
 
-/* Enhanced large screen improvements */
 @media (min-width: 1024px) {
-  .max-w-6xl {
-    max-width: 80rem;
-  }
-
   .terminal-border {
     border-width: 2px;
     box-shadow: 0 0 25px rgba(0, 255, 0, 0.4);
   }
 }
 
-/* Improved touch-friendly adjustments */
-@media (hover: none) and (pointer: coarse) {
-  .terminal-scan {
-    animation-duration: 1.5s;
-  }
-
-  button {
-    min-height: 48px;
-    padding-left: 1.25rem;
-    padding-right: 1.25rem;
-  }
-
-  /* Better active states for touch */
-  button:active {
-    transform: scale(0.98);
-    transition: transform 0.1s ease;
-  }
-
-  input:focus {
-    outline: 2px solid rgba(0, 255, 0, 0.3);
-    outline-offset: 2px;
-  }
-}
-
-/* Enhanced scrollbar styling for mobile */
-@media (max-width: 768px) {
-  #messagesContainer::-webkit-scrollbar {
-    width: 3px;
-  }
-
-  #messagesContainer::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.1);
-  }
-
-  #messagesContainer::-webkit-scrollbar-thumb {
-    background: rgba(0, 255, 0, 0.4);
-    border-radius: 2px;
-  }
-
-  #messagesContainer::-webkit-scrollbar-thumb:active {
-    background: rgba(0, 255, 0, 0.6);
-  }
-}
-
-/* Accessibility improvements */
 @media (prefers-reduced-motion: reduce) {
   .terminal-scan,
   .cursor-blink::after,
-  .typing-effect,
   button:active {
     animation: none !important;
     transform: none !important;
   }
 }
 
-/* High contrast mode support */
 @media (prefers-contrast: high) {
   .terminal-border {
     border-width: 3px;
     box-shadow: 0 0 30px rgba(0, 255, 0, 0.6);
   }
-
-  button {
-    border-width: 2px;
-  }
-
-  input {
-    border-bottom-width: 3px;
-  }
 }
 
-/* Dark mode optimizations */
 @media (prefers-color-scheme: dark) {
   body {
     background: #000000;
