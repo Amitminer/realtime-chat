@@ -12,9 +12,9 @@
 </head>
 <body class="bg-black text-green-400 matrix-bg h-screen overflow-hidden">
     <!-- Simplified container structure with proper height management -->
-    <div class="h-full flex flex-col w-full max-w-3xl mx-auto terminal-border terminal-scan">
+    <div class="h-screen flex flex-col w-full max-w-3xl mx-auto terminal-border terminal-scan">
         <!-- Compact title bar -->
-        <header class="bg-black border-b border-green-400 px-4 py-2 flex-shrink-0">
+        <header class="bg-black border-b border-green-400 px-4 py-3 flex-shrink-0 relative z-10">
             <div class="flex items-center justify-between text-sm">
                 <span class="text-yellow-400 font-medium">TERMINAL CHAT</span>
                 <div id="connectionStatus" class="flex items-center">
@@ -109,8 +109,8 @@
             </div>
             
             <!-- Simple fixed input at bottom - no overlay -->
-            <div class="border-t-2 border-green-400 bg-black flex-shrink-0">
-                <form id="messageForm" class="flex items-center gap-3 p-4">
+            <div class="border-t-2 border-green-400 bg-black flex-shrink-0 pb-safe">
+                <form id="messageForm" class="flex items-center gap-3 p-4 pb-6">
                     <div class="flex-1 flex items-center min-w-0">
                         <span class="text-green-500 text-sm font-medium hidden sm:inline flex-shrink-0 mr-3" id="promptPrefix">guest@chat:~$</span>
                         <input
