@@ -46,8 +46,8 @@ body {
 }
 
 .terminal-border {
-  border: 2px solid #00ff00;
-  box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+  border: 1px solid #00ff00;
+  box-shadow: 0 0 15px rgba(0, 255, 0, 0.2);
 }
 
 .message-slide::before {
@@ -56,17 +56,17 @@ body {
 }
 
 .system-message::before {
-  content: "[SYSTEM] ";
+  content: "[SYS] ";
   color: #ffff00;
 }
 
 .scrollbar-thin {
   scrollbar-width: thin;
-  scrollbar-color: rgba(0, 255, 0, 0.4) transparent;
+  scrollbar-color: rgba(0, 255, 0, 0.3) transparent;
 }
 
 .scrollbar-thin::-webkit-scrollbar {
-  width: 4px;
+  width: 3px;
 }
 
 .scrollbar-thin::-webkit-scrollbar-track {
@@ -74,55 +74,42 @@ body {
 }
 
 .scrollbar-thin::-webkit-scrollbar-thumb {
-  background: rgba(0, 255, 0, 0.4);
+  background: rgba(0, 255, 0, 0.3);
   border-radius: 2px;
 }
 
 .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 255, 0, 0.6);
+  background: rgba(0, 255, 0, 0.5);
 }
 
 .matrix-bg {
-  background-image: radial-gradient(circle at 25% 25%, #00ff0010 1px, transparent 1px),
-    radial-gradient(circle at 75% 75%, #00ff0008 1px, transparent 1px);
-  background-size: 50px 50px;
+  background-image: radial-gradient(circle at 25% 25%, #00ff0008 1px, transparent 1px),
+    radial-gradient(circle at 75% 75%, #00ff0005 1px, transparent 1px);
+  background-size: 40px 40px;
 }
 
+/* Simplified mobile styles and removed redundant CSS */
 @media (max-width: 768px) {
-  body {
-    font-size: 14px;
-  }
-
   .terminal-border {
     border-width: 1px;
-    box-shadow: 0 0 10px rgba(0, 255, 0, 0.2);
+    box-shadow: 0 0 8px rgba(0, 255, 0, 0.15);
   }
 
   #messagesContainer {
-    padding: 0.75rem;
-    font-size: 14px;
-    line-height: 1.6;
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: contain;
-    padding-bottom: 1rem;
   }
 
   #messageInput {
-    font-size: 16px;
-    padding: 0.75rem 0;
-  }
-
-  .terminal-scan {
-    background-size: 100% 3px;
-    --scan-animation-duration: 1.2s;
+    font-size: 16px; /* Prevents zoom on iOS */
   }
 
   .matrix-bg {
-    background-size: 30px 30px;
+    background-size: 25px 25px;
   }
 
   button {
-    min-height: 44px;
+    min-height: 40px;
     touch-action: manipulation;
     -webkit-tap-highlight-color: rgba(0, 255, 0, 0.1);
   }
@@ -131,49 +118,16 @@ body {
     transform: scale(0.98);
     transition: transform 0.1s ease;
   }
+}
 
-  #errorToast {
-    border-radius: 4px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-  }
+/* Added safe area support for devices with notches */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 @media (max-width: 480px) {
-  body {
-    font-size: 13px;
-  }
-
-  #messagesContainer {
-    font-size: 13px;
-    padding: 0.5rem;
-    line-height: 1.5;
-  }
-
   .matrix-bg {
-    background-size: 25px 25px;
-  }
-
-  button {
-    min-height: 44px;
-    font-size: 14px;
-  }
-
-  input {
-    font-size: 16px;
-    padding: 0.5rem 0;
-  }
-}
-
-@media (max-width: 375px) {
-  .xs\:inline {
-    display: inline;
-  }
-}
-
-@media (min-width: 1024px) {
-  .terminal-border {
-    border-width: 2px;
-    box-shadow: 0 0 25px rgba(0, 255, 0, 0.4);
+    background-size: 20px 20px;
   }
 }
 
@@ -186,20 +140,9 @@ body {
   }
 }
 
-@media (prefers-contrast: high) {
+@media (min-width: 1024px) {
   .terminal-border {
-    border-width: 3px;
-    box-shadow: 0 0 30px rgba(0, 255, 0, 0.6);
-  }
-}
-
-@media (prefers-color-scheme: dark) {
-  body {
-    background: #000000;
-  }
-
-  .matrix-bg {
-    background-image: radial-gradient(circle at 25% 25%, #00ff0015 1px, transparent 1px),
-      radial-gradient(circle at 75% 75%, #00ff0010 1px, transparent 1px);
+    border-width: 2px;
+    box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
   }
 }

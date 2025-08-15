@@ -10,27 +10,27 @@
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.1.11"></script>
     <link rel="stylesheet" href="styles.css">
 </head>
-<body class="bg-black text-green-400 h-screen overflow-hidden matrix-bg">
+<body class="bg-black text-green-400 matrix-bg min-h-screen">
     <!-- Added mobile-optimized container with better responsive classes -->
-    <div class="h-full flex flex-col w-full max-w-4xl mx-auto terminal-border terminal-scan px-1 sm:px-0">
+    <div class="min-h-screen flex flex-col w-full max-w-3xl mx-auto terminal-border terminal-scan px-1 sm:px-0">
         <!-- Terminal Header -->
         <!-- Improved header spacing and text sizing for mobile -->
-        <header class="bg-black border-b-2 border-green-400 px-2 sm:px-4 py-2 sm:py-3 flex-shrink-0">
-            <div class="flex items-center justify-between text-xs sm:text-sm flex-wrap gap-y-1 gap-x-2">
-                <div class="flex items-center space-x-2 sm:space-x-4 min-w-0 flex-1">
-                    <span class="text-yellow-400 truncate text-xs sm:text-sm font-medium">[ROOT@CHATROOM]</span>
-                    <span class="truncate text-xs sm:text-sm hidden xs:inline">~$ ./terminal-chat</span>
+        <header class="bg-black border-b border-green-400 px-2 sm:px-4 py-1 sm:py-2 flex-shrink-0">
+            <div class="flex items-center justify-between text-xs flex-wrap gap-1">
+                <div class="flex items-center space-x-2 min-w-0 flex-1">
+                    <span class="text-yellow-400 truncate font-medium">TERMINAL</span>
+                    <span class="truncate hidden sm:inline">~$ ./chat</span>
                 </div>
                 <div id="connectionStatus" class="flex items-center flex-shrink-0">
-                    <span class="w-2 h-2 bg-red-500 rounded-full mr-2 animate-pulse"></span>
-                    <span class="text-red-400 truncate text-xs sm:text-sm font-medium">DISCONNECTED</span>
+                    <span class="w-1.5 h-1.5 bg-red-500 rounded-full mr-1 animate-pulse"></span>
+                    <span class="text-red-400 truncate font-medium">OFFLINE</span>
                 </div>
             </div>
         </header>
 
         <!-- Password Authentication -->
         <!-- Enhanced mobile padding and touch targets -->
-        <div id="passwordSection" class="flex-1 flex items-center justify-center p-3 sm:p-8">
+        <div id="passwordSection" class="flex-1 flex items-center justify-center p-4 sm:p-8">
             <div class="w-full max-w-md">
                 <div class="terminal-border bg-black p-4 sm:p-6 mx-2 sm:mx-0">
                     <div class="text-center mb-6">
@@ -70,7 +70,7 @@
 
         <!-- Username Setup -->
         <!-- Enhanced mobile padding and touch targets -->
-        <div id="usernameSection" class="hidden flex-1 flex items-center justify-center p-3 sm:p-8">
+        <div id="usernameSection" class="hidden flex-1 flex items-center justify-center p-4 sm:p-8">
             <div class="w-full max-w-md">
                 <div class="terminal-border bg-black p-4 sm:p-6 mx-2 sm:mx-0">
                     <div class="text-center mb-6">
@@ -106,22 +106,23 @@
         <!-- Chat Interface -->
         <div id="chatInterface" class="hidden flex-1 min-h-0 flex flex-col">
             <!-- Messages Container -->
-            <div id="messagesContainer" class="flex-1 overflow-y-auto p-3 sm:p-4 scrollbar-thin text-sm sm:text-base leading-relaxed overscroll-contain">
+            <!-- Reduced padding and improved mobile spacing -->
+            <div id="messagesContainer" class="flex-1 overflow-y-auto p-2 sm:p-4 scrollbar-thin text-sm leading-relaxed overscroll-contain">
                 <div class="system-message text-yellow-400 mb-2">Terminal initialized... Connecting to secure channel...</div>
                 <div class="system-message text-yellow-400 mb-4">Type /help for available commands</div>
             </div>
 
-            <!-- Fixed mobile input positioning and improved layout -->
-            <div class="border-t-2 border-green-400 bg-black flex-shrink-0 sticky bottom-0">
-                <form id="messageForm" class="flex items-stretch gap-2 p-2 sm:p-4">
+            <!-- Moved input area higher and improved mobile layout -->
+            <div class="border-t border-green-400 bg-black flex-shrink-0 pb-safe">
+                <form id="messageForm" class="flex items-center gap-2 p-2 sm:p-3">
                     <div class="flex-1 flex items-center min-w-0">
-                        <span class="text-green-500 text-sm font-medium hidden sm:inline flex-shrink-0 mr-2" id="promptPrefix">guest@chat:~$</span>
+                        <span class="text-green-500 text-xs font-medium hidden sm:inline flex-shrink-0 mr-2" id="promptPrefix">guest@chat:~$</span>
                         <input
                             type="text"
                             id="messageInput"
-                            placeholder="Type your message..."
+                            placeholder="Type message..."
                             maxlength="500"
-                            class="flex-1 bg-transparent border-none outline-none text-green-400 placeholder-green-600 text-base py-3 font-medium min-w-0"
+                            class="flex-1 bg-transparent border-none outline-none text-green-400 placeholder-green-600 text-base py-2 font-medium min-w-0"
                             required
                             autocomplete="off"
                         >
@@ -130,9 +131,9 @@
                       type="submit"
                       id="sendButton"
                       aria-label="Send message"
-                      class="bg-green-900 text-green-300 px-3 sm:px-4 py-2 border-2 border-green-500 hover:bg-green-800 active:bg-green-700 transition-all duration-150 flex-shrink-0 text-sm font-medium min-h-[44px] touch-manipulation rounded-sm"
+                      class="bg-green-900 text-green-300 px-3 py-2 border border-green-500 hover:bg-green-800 active:bg-green-700 transition-all duration-150 flex-shrink-0 text-sm font-medium min-h-[40px] touch-manipulation rounded"
                     >
-                      <span class="hidden sm:inline">[SEND]</span>
+                      <span class="hidden sm:inline">SEND</span>
                       <span class="sm:hidden">→</span>
                     </button>
                 </form>
