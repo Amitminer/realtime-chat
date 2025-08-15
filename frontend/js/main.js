@@ -112,6 +112,20 @@ class TerminalChat {
 				}
 			}
 		});
+		
+		// Handle mobile focus behavior
+		this.ui.elements.messageInput.addEventListener("focus", () => {
+			// Scroll to bottom when input is focused on mobile
+			setTimeout(() => {
+				this.ui.scrollToBottom();
+			}, 300);
+		});
+		
+		// Handle window resize events
+		window.addEventListener("resize", () => {
+			// Maintain scroll position on resize
+			this.ui.scrollToBottom();
+		});
 	}
 
 	/**

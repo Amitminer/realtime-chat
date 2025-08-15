@@ -5,6 +5,10 @@
 body {
     background: #0a0a0a;
     color: #00ff00;
+    -webkit-text-size-adjust: 100%;
+    -moz-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+    text-size-adjust: 100%;
 }
 
 .terminal-scan {
@@ -34,6 +38,10 @@ body {
 .terminal-border {
     border: 2px solid #00ff00;
     box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+}
+
+#messageInput {
+    min-width: 100px;
 }
 
 .message-slide::before {
@@ -78,5 +86,46 @@ body {
     .cursor-blink::after,
     .typing-effect {
         animation: none !important;
+    }
+}
+
+/* Mobile-specific */
+@media (max-width: 640px) {
+    body {
+        font-size: 14px;
+    }
+    
+    .terminal-border {
+        border-width: 1px;
+        box-shadow: 0 0 10px rgba(0, 255, 0, 0.2);
+    }
+    
+    #messagesContainer {
+        padding: 0.5rem;
+        font-size: 12px;
+        line-height: 1.4;
+    }
+    
+    #messageInput {
+        font-size: 14px;
+    }
+    
+    .terminal-scan {
+        background-size: 100% 3px;
+    }
+    
+    @keyframes scan {
+        0% { background-position: 0 0; }
+        100% { background-position: 0 3px; }
+    }
+    
+    .matrix-bg {
+        background-size: 30px 30px;
+    }
+    
+    /* Fix for input zooming on iOS */
+    input[type="text"],
+    input[type="password"] {
+        font-size: 16px;
     }
 }

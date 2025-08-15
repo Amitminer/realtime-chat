@@ -164,7 +164,10 @@ export class UIManager {
 
   scrollToBottom() {
     const container = this.elements.messagesContainer;
-    container.scrollTop = container.scrollHeight;
+    // Use requestAnimationFrame to ensure DOM is updated before scrolling
+    requestAnimationFrame(() => {
+      container.scrollTop = container.scrollHeight;
+    });
   }
 
   limitMessages() {
