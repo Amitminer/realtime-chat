@@ -8,12 +8,47 @@ use std::path::Path;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 pub fn handle_connection(mut stream: TcpStream, config: ServerConfig) {
-    let mut buffer = [0; 1024];
-    if stream.read(&mut buffer).is_err() {
+    // Increased buffer size to handle large HTTP headers
+    const BUFFER_SIZE: usize = 8192;
+    const MAX_HEADER_SIZE: usize = 32768; // Maximum header size we'll accept
+
+    let mut buffer = Vec::new();
+    let mut temp_buf = [0; BUFFER_SIZE];
+    let mut header_end_found = false;
+
+    // Read data until we find the header end marker or exceed max size
+    while buffer.len() < MAX_HEADER_SIZE {
+        match stream.read(&mut temp_buf) {
+            Ok(0) => break, // Connection closed
+            Ok(bytes_read) => {
+                // Add the newly read bytes to our buffer
+                buffer.extend_from_slice(&temp_buf[..bytes_read]);
+
+                // Check if we've found the end of headers
+                if buffer.len() >= 4 {
+                    let buf_slice = &buffer[buffer.len().saturating_sub(bytes_read + 4)..];
+                    if buf_slice.windows(4).any(|window| window == b"\r\n\r\n") {
+                        header_end_found = true;
+                        break;
+                    }
+                }
+
+                // If we've read less than the buffer size, we might be done
+                if bytes_read < BUFFER_SIZE {
+                    break;
+                }
+            }
+            Err(_) => return, // Error reading from stream
+        }
+    }
+
+    // If we didn't find the header end and exceeded max size, return error
+    if !header_end_found && buffer.len() >= MAX_HEADER_SIZE {
+        send_error_response(&mut stream, 431, "Request Header Fields Too Large");
         return;
     }
 
-    let request = String::from_utf8_lossy(&buffer[..]);
+    let request = String::from_utf8_lossy(&buffer);
     let request_line = request.lines().next().unwrap_or("");
 
     if is_websocket_upgrade(&request) {
@@ -73,9 +108,8 @@ fn handle_live_reload(stream: &mut TcpStream) {
         .as_millis() as u64;
     let last_change = crate::watcher::get_last_change();
 
-    let response_body = format!(
-        r#"{{"lastChange": {last_change}, "currentTime": {current_time}}}"#
-    );
+    let response_body =
+        format!(r#"{{"lastChange": {last_change}, "currentTime": {current_time}}}"#);
     send_response(
         stream,
         200,
@@ -124,10 +158,11 @@ fn serve_file(stream: &mut TcpStream, config: &ServerConfig, requested_path: &st
 }
 
 fn serve_runtime_config(stream: &mut TcpStream, ws_url: &Option<String>) {
-    let body = format!(
-        "window.__RUNTIME_CONFIG__ = {{ WS_URL: '{}' }};\n",
-        ws_url.clone().unwrap_or_default()
-    );
+    let escaped_ws_url = ws_url
+        .as_ref()
+        .map(|url| url.replace('\\', "\\\\").replace('\'', "\\'"))
+        .unwrap_or_default();
+    let body = format!("window.__RUNTIME_CONFIG__ = {{ WS_URL: \\'{escaped_ws_url}\\' }}\n");
     send_response(
         stream,
         200,
@@ -250,7 +285,8 @@ fn get_live_reload_script() -> String {
     connectWebSocket();
 })();
 </script>
-"#.to_string()
+"#
+    .to_string()
 }
 
 fn send_response(
@@ -259,9 +295,13 @@ fn send_response(
     status_text: &str,
     content_type: &str,
     body: &[u8],
-    _no_cache: bool,
+    no_cache: bool,
 ) {
-    let cache_header = "Cache-Control: no-cache\r\n";
+    let cache_header = if no_cache {
+        "Cache-Control: no-cache\r\n"
+    } else {
+        "Cache-Control: public, max-age=3600\r\n"
+    };
 
     let response = format!(
         "HTTP/1.1 {} {}\r\n\
@@ -277,7 +317,11 @@ fn send_response(
     );
 
     if stream.write_all(response.as_bytes()).is_ok() {
-        let _ = stream.write_all(body);
+        if let Err(e) = stream.write_all(body) {
+            eprintln!("Failed to write response body: {e}");
+        }
+    } else {
+        eprintln!("Failed to write response headers");
     }
 }
 
@@ -288,7 +332,14 @@ fn send_error_response(stream: &mut TcpStream, status_code: u16, status_text: &s
         <body><h1>{status_code} {status_text}</h1></body></html>"
     );
 
-    send_response(stream, status_code, status_text, "text/html", body.as_bytes(), true);
+    send_response(
+        stream,
+        status_code,
+        status_text,
+        "text/html",
+        body.as_bytes(),
+        true,
+    );
 }
 
 fn get_mime_type(path: &Path) -> &'static str {

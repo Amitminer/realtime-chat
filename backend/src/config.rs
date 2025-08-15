@@ -1,23 +1,39 @@
 //! Server configuration loader.
-//! Reads values from environment variables and applies sensible defaults.
 //!
-//! Variables:
-//! - `HOST` (default `0.0.0.0`)
-//! - `PORT` (default `9001`)
+//! This module handles loading configuration from environment variables
+//! and applying sensible defaults. It also validates that required
+//! configuration values are present and valid.
+//!
+//! Configuration variables:
+//! - `BACKEND_HOST` (default `0.0.0.0`)
+//! - `BACKEND_PORT` (default `9001`)
 //! - `BIND_ADDR` (optional; overrides host/port)
 //! - `SERVER_PASSWORD` (required)
+
 use std::env;
 use std::io::{Error, ErrorKind};
 
 /// In-memory representation of server configuration.
+///
+/// This struct holds all the configuration values needed to run the server.
 #[derive(Clone, Debug)]
 pub struct Config {
+    /// The address to bind to (e.g., "0.0.0.0:9001")
     pub bind_addr: String,
+    /// The password required for client authentication
     pub server_password: String,
 }
 
 impl Config {
     /// Construct configuration from environment variables.
+    ///
+    /// This function reads configuration from environment variables,
+    /// applies defaults where appropriate, and validates that required
+    /// values are present and valid.
+    ///
+    /// # Returns
+    ///
+    /// A Result containing the Config if successful, or an error
     pub fn from_env() -> Result<Self, Box<dyn std::error::Error>> {
         // Coalesce unset or empty HOST to default
         // Coalesce unset or empty HOST to default

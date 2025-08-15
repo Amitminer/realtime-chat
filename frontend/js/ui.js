@@ -29,6 +29,17 @@ export class UIManager {
       errorMessage: document.getElementById("errorMessage"),
       closeError: document.getElementById("closeError"),
     };
+    
+    // Validate all required elements exist
+    const missingElements = [];
+    for (const [key, element] of Object.entries(this.elements)) {
+      if (!element) {
+        missingElements.push(key);
+      }
+    }
+    if (missingElements.length > 0) {
+      throw new Error(`Missing required DOM elements: ${missingElements.join(", ")}`);
+    }
   }
 
   /**

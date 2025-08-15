@@ -1,3 +1,11 @@
+//! HTTP server initialization and main loop.
+//!
+//! This module contains the core server logic including:
+//! - TCP listener setup
+//! - Startup information printing
+//! - File watcher initialization (for live reload)
+//! - Main connection handling loop
+
 use crate::colors::*;
 use crate::config::ServerConfig;
 use crate::handlers::handle_connection;
@@ -5,6 +13,17 @@ use crate::watcher::start_file_watcher;
 use std::net::TcpListener;
 use std::thread;
 
+/// Start the HTTP server and begin listening for connections.
+///
+/// This function:
+/// 1. Binds to the configured host and port
+/// 2. Prints startup information
+/// 3. Starts the file watcher (if live reload is enabled)
+/// 4. Enters the main connection handling loop
+///
+/// # Arguments
+///
+/// * `config` - The server configuration
 pub fn run_server(config: ServerConfig) {
     let bind_addr = format!("{}:{}", config.host, config.port);
     let listener = TcpListener::bind(&bind_addr).unwrap_or_else(|e| {
@@ -43,6 +62,18 @@ pub fn run_server(config: ServerConfig) {
     println!("{DIM}Frontend server process finished.{RESET}");
 }
 
+/// Print startup information to the console.
+///
+/// Displays server configuration details including:
+/// - Server URL
+/// - Root directory
+/// - Live reload status
+/// - WebSocket URL (if configured)
+///
+/// # Arguments
+///
+/// * `config` - The server configuration
+/// * `bind_addr` - The address the server is bound to
 fn print_startup_info(config: &ServerConfig, bind_addr: &str) {
     println!(
         "{GREEN}🚀 Static server running at {BOLD}http://{bind_addr}{RESET}"

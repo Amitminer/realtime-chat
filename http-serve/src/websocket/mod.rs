@@ -1,3 +1,15 @@
+//! WebSocket handling for live reload functionality.
+//!
+//! This module implements a minimal WebSocket server for handling live reload
+//! notifications. It supports the WebSocket handshake protocol and maintains
+//! a collection of connected clients to broadcast reload messages.
+//!
+//! Features:
+//! - WebSocket handshake handling
+//! - Client connection management
+//! - Broadcast messaging to all connected clients
+//! - Automatic client cleanup on disconnect
+
 use crate::colors::*;
 use base64::{engine::general_purpose, Engine as _};
 use sha1::{Digest, Sha1};
@@ -18,6 +30,15 @@ lazy_static::lazy_static! {
     static ref CLIENT_COUNTER: Arc<Mutex<ClientId>> = Arc::new(Mutex::new(0));
 }
 
+/// Handle a WebSocket upgrade request.
+///
+/// This function performs the WebSocket handshake and spawns a new thread
+/// to handle the WebSocket connection.
+///
+/// # Arguments
+///
+/// * `stream` - The TCP stream for the connection
+/// * `request` - The raw HTTP request as a string
 pub fn handle_websocket_upgrade(stream: TcpStream, request: &str) {
     if let Ok(websocket) = perform_handshake(stream, request) {
         let client_id = {
@@ -41,6 +62,19 @@ pub fn handle_websocket_upgrade(stream: TcpStream, request: &str) {
     }
 }
 
+/// Perform the WebSocket handshake.
+///
+/// This function validates the WebSocket upgrade request and sends the
+/// appropriate response to establish the WebSocket connection.
+///
+/// # Arguments
+///
+/// * `stream` - The TCP stream for the connection
+/// * `request` - The raw HTTP request as a string
+///
+/// # Returns
+///
+/// A Result containing the WebSocket stream if successful, or an error
 fn perform_handshake(
     mut stream: TcpStream,
     request: &str,
@@ -61,6 +95,15 @@ fn perform_handshake(
     Ok(WebSocket::from_raw_socket(stream, Role::Server, None))
 }
 
+/// Extract the WebSocket key from the HTTP upgrade request.
+///
+/// # Arguments
+///
+/// * `request` - The raw HTTP request as a string
+///
+/// # Returns
+///
+/// Some(String) with the WebSocket key if found, None otherwise
 fn extract_websocket_key(request: &str) -> Option<String> {
     for line in request.lines() {
         if line.to_lowercase().starts_with("sec-websocket-key:") {
@@ -70,6 +113,18 @@ fn extract_websocket_key(request: &str) -> Option<String> {
     None
 }
 
+/// Generate the WebSocket accept key.
+///
+/// This function implements the WebSocket handshake key generation algorithm
+/// as specified in RFC 6455.
+///
+/// # Arguments
+///
+/// * `client_key` - The client's WebSocket key
+///
+/// # Returns
+///
+/// The generated accept key as a base64-encoded string
 fn generate_response_key(client_key: &str) -> String {
     const WEBSOCKET_MAGIC_STRING: &str = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
     let mut hasher = Sha1::new();
@@ -79,53 +134,70 @@ fn generate_response_key(client_key: &str) -> String {
     general_purpose::STANDARD.encode(result)
 }
 
+/// Handle a WebSocket client connection.
+///
+/// This function manages the lifecycle of a WebSocket client connection,
+/// reading messages and handling ping/pong frames. The connection is
+/// automatically cleaned up when closed or on error.
+///
+/// # Arguments
+///
+/// * `client_id` - The unique identifier for this client
 fn handle_websocket_client(client_id: ClientId) {
     loop {
-        let should_break = {
-            let mut clients = WEBSOCKET_CLIENTS.lock().unwrap();
+        // Take the websocket out of the map to release the lock while we read from it.
+        let mut websocket = match WEBSOCKET_CLIENTS.lock().unwrap().remove(&client_id) {
+            Some(ws) => ws,
+            // If the client is not in the map, it was likely removed by another thread (e.g., broadcast).
+            // We can terminate this handler thread.
+            None => return,
+        };
 
-            if let Some(websocket) = clients.get_mut(&client_id) {
-                match websocket.read() {
-                    Ok(Message::Close(_)) => {
-                        println!(
-                            "{YELLOW}🔌 WebSocket client {client_id} disconnected (close frame){RESET}"
-                        );
-                        true
-                    }
-                    Ok(Message::Ping(payload)) => {
-                        if websocket.send(Message::Pong(payload)).is_err() {
-                            println!(
-                                "{YELLOW}🔌 WebSocket client {client_id} disconnected (pong failed){RESET}"
-                            );
-                            true
-                        } else {
-                            false
-                        }
-                    }
-                    Ok(_) => false,
-                    Err(_) => {
-                        println!(
-                            "{YELLOW}🔌 WebSocket client {client_id} disconnected (error){RESET}"
-                        );
-                        true
-                    }
+        // Block on `read` without holding the lock on the client map.
+        let should_break = match websocket.read() {
+            Ok(Message::Close(_)) => {
+                println!(
+                    "{YELLOW}🔌 WebSocket client {client_id} disconnected (close frame){RESET}"
+                );
+                true
+            }
+            Ok(Message::Ping(payload)) => {
+                if websocket.send(Message::Pong(payload)).is_err() {
+                    println!(
+                        "{YELLOW}🔌 WebSocket client {client_id} disconnected (pong failed){RESET}"
+                    );
+                    true
+                } else {
+                    false
                 }
-            } else {
+            }
+            Ok(_) => false, // Other messages are fine, continue loop.
+            Err(_) => {
+                println!(
+                    "{YELLOW}🔌 WebSocket client {client_id} disconnected (error){RESET}"
+                );
                 true
             }
         };
 
         if should_break {
+            // Don't re-insert the websocket; it will be removed after the loop.
             break;
+        } else {
+            // If the connection is still active, put the websocket back in the map
+            // so other threads (like broadcast) can access it.
+            WEBSOCKET_CLIENTS.lock().unwrap().insert(client_id, websocket);
         }
-
-        thread::sleep(std::time::Duration::from_millis(100));
     }
 
-    let mut clients = WEBSOCKET_CLIENTS.lock().unwrap();
-    clients.remove(&client_id);
+    // Final removal of the client from the map.
+    WEBSOCKET_CLIENTS.lock().unwrap().remove(&client_id);
 }
 
+/// Broadcast a reload message to all connected WebSocket clients.
+///
+/// This function sends a reload message to all currently connected WebSocket
+/// clients and automatically cleans up any disconnected clients.
 pub fn broadcast_reload_message() {
     let mut clients = WEBSOCKET_CLIENTS.lock().unwrap();
     let message = Message::Text(r#"{"type":"reload"}"#.to_string());
@@ -146,6 +218,11 @@ pub fn broadcast_reload_message() {
     }
 }
 
+/// Get the current number of connected WebSocket clients.
+///
+/// # Returns
+///
+/// The number of currently connected WebSocket clients
 pub fn get_client_count() -> usize {
     let clients = WEBSOCKET_CLIENTS.lock().unwrap();
     clients.len()

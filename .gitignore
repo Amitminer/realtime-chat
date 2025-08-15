@@ -6,7 +6,9 @@ node_modules/
 
 # Env
 .env
-
+strace.log
+todo.md
+HardFix.md
 # Build artifacts
 /dist/
 /build/

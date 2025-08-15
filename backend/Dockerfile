@@ -1,5 +1,5 @@
 # Build stage (use slim image with 2024 edition support)
-FROM rust:1.85-slim AS builder
+FROM rust:1.89-slim AS builder
 WORKDIR /app
 COPY backend/Cargo.toml ./
 COPY Cargo.lock ./

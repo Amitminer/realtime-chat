@@ -180,6 +180,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "constant_time_eq"
+version = "0.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7c74b8349d32d297c9134b8c88677813a227df8f779daa29bfc29c183fe3dca6"
+
+[[package]]
 name = "core-foundation-sys"
 version = "0.8.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -393,6 +399,7 @@ dependencies = [
  "dotenvy",
  "lazy_static",
  "notify",
+ "serde_json",
  "sha1",
  "tungstenite 0.21.0",
 ]
@@ -896,6 +903,7 @@ dependencies = [
  "aes-gcm",
  "base64 0.22.1",
  "chrono",
+ "constant_time_eq",
  "dotenvy",
  "futures-util",
  "pbkdf2",
