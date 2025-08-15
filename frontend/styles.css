@@ -146,30 +146,3 @@ body {
     box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
   }
 }
-
-/* Added overlay styles for mobile input */
-#inputOverlay.show {
-  transform: translateY(0);
-}
-
-#composeButton {
-  box-shadow: 0 4px 12px rgba(0, 255, 0, 0.3);
-}
-
-#composeButton:active {
-  transform: scale(0.95);
-}
-
-/* Improved mobile overlay backdrop */
-@media (max-width: 640px) {
-  #inputOverlay.show::before {
-    content: "";
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: -1;
-  }
-}
