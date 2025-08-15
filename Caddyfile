@@ -1,4 +1,4 @@
-omnicraft.ddns.net {
+example.com {
     # Forward normal web requests to frontend
     reverse_proxy frontend:8080
 
