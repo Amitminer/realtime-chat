@@ -10,9 +10,9 @@
 //! 4. Server broadcasts EncryptedChatMessage for join/leave/chat events
 
 use serde::{Deserialize, Serialize};
-use tokio_tungstenite::tungstenite::Message;
 use std::{collections::HashMap, sync::Arc};
-use tokio::sync::{mpsc, RwLock};
+use tokio::sync::{RwLock, mpsc};
+use tokio_tungstenite::tungstenite::Message;
 
 /// Sender for WebSocket text frames to a single client.
 pub type Tx = mpsc::Sender<Message>;
@@ -77,6 +77,8 @@ pub struct EncryptedChatMessage {
     pub encrypted_message: String,
     /// Base64-encoded nonce used for encryption
     pub nonce: String,
+    /// Base64-encoded salt used for key derivation
+    pub salt: String,
     /// ISO 8601 timestamp
     pub timestamp: String,
     /// Type of message

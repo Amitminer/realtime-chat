@@ -227,21 +227,19 @@ async fn handle_connection(
                     }
                 }
 
-                let (encrypted_message, nonce, _salt) = match encryption_manager
-                    .as_ref()
-                    .encrypt_message(&format!("{username} joined the chat"))
-                {
-                    Ok(v) => v,
-                    Err(e) => {
-                        eprintln!("Encryption failed: {e}");
-                        continue;
-                    }
-                };
+                let (encrypted_message, nonce, salt) = match encryption_manager
+                        .as_ref()
+                        .encrypt_message(&format!("{username} joined the chat"))
+                    {
+                        Ok(v) => v,
+                        Err(_) => continue,
+                    };
                 let msg = EncryptedChatMessage {
                     user_id: user_id.clone(),
                     username: username.clone(),
                     encrypted_message,
                     nonce,
+                    salt,
                     timestamp: chrono::Utc::now().to_rfc3339(),
                     message_type: MessageType::Join,
                 };
@@ -257,7 +255,7 @@ async fn handle_connection(
                 enc_msg.message_type = MessageType::Chat;
                 let _ = broadcast_encrypted_message(&peer_map, &enc_msg).await;
             } else if let Ok(chat_msg) = serde_json::from_str::<ChatMessage>(text) {
-                let (encrypted_message, nonce, _salt) = match encryption_manager
+                let (encrypted_message, nonce, salt) = match encryption_manager
                     .as_ref()
                     .encrypt_message(&chat_msg.message)
                 {
@@ -272,12 +270,13 @@ async fn handle_connection(
                     username: username.clone(),
                     encrypted_message,
                     nonce,
+                    salt,
                     timestamp: chrono::Utc::now().to_rfc3339(),
                     message_type: MessageType::Chat,
                 };
                 let _ = broadcast_encrypted_message(&peer_map, &enc_msg).await;
             } else {
-                let (encrypted_message, nonce, _salt) =
+                let (encrypted_message, nonce, salt) =
                     match encryption_manager.as_ref().encrypt_message(text) {
                         Ok(v) => v,
                         Err(e) => {
@@ -290,6 +289,7 @@ async fn handle_connection(
                     username: username.clone(),
                     encrypted_message,
                     nonce,
+                    salt,
                     timestamp: chrono::Utc::now().to_rfc3339(),
                     message_type: MessageType::Chat,
                 };
@@ -306,12 +306,13 @@ async fn handle_connection(
             .as_ref()
             .encrypt_message(&format!("{username} left the chat"));
 
-        if let Ok((encrypted_message, nonce, _salt)) = encryption_result {
+        if let Ok((encrypted_message, nonce, salt)) = encryption_result {
             let leave_msg = EncryptedChatMessage {
                 user_id: user_id.clone(),
                 username: username.clone(),
                 encrypted_message,
                 nonce,
+                salt,
                 timestamp: chrono::Utc::now().to_rfc3339(),
                 message_type: MessageType::Leave,
             };

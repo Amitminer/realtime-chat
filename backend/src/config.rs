@@ -36,7 +36,6 @@ impl Config {
     /// A Result containing the Config if successful, or an error
     pub fn from_env() -> Result<Self, Box<dyn std::error::Error>> {
         // Coalesce unset or empty HOST to default
-        // Coalesce unset or empty HOST to default
         let host = env::var("BACKEND_HOST")
             .ok()
             .filter(|v| !v.trim().is_empty())
@@ -55,8 +54,8 @@ impl Config {
             .unwrap_or_else(|| format!("{host}:{port}"));
 
         // SERVER_PASSWORD must be present and non-empty
-        let server_password = env::var("SERVER_PASSWORD")
-            .map_err(|e| Box::new(e) as Box<dyn std::error::Error>)?;
+        let server_password =
+            env::var("SERVER_PASSWORD").map_err(|e| Box::new(e) as Box<dyn std::error::Error>)?;
         if server_password.is_empty() {
             return Err(Box::new(Error::new(
                 ErrorKind::InvalidInput,
@@ -64,6 +63,9 @@ impl Config {
             )));
         }
 
-        Ok(Self { bind_addr, server_password })
+        Ok(Self {
+            bind_addr,
+            server_password,
+        })
     }
 }

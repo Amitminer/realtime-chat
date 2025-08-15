@@ -3,7 +3,7 @@
  * Orchestrates socket lifecycle, authentication, UI state and crypto.
  */
 
-import { deriveKeyFromPassword, encryptWithKey, decryptWithKey } from "./crypto.js";
+import { deriveKeyFromPasswordWithSalt, deriveKeyFromPassword, decryptWithKey, encryptWithKey, decryptWithPassword, encryptWithPassword } from "./crypto.js";
 import { UIManager } from "./ui.js";
 import { getCookie, setCookie, deleteCookie } from "./utils.js";
 
@@ -30,6 +30,9 @@ class TerminalChat {
 
 		/** @type {CryptoKey|null} */
 		this.encryptionKey = null;
+
+		/** @type {string|null} */
+		this.userPassword = null;
 
 		/** @type {Set<string>} */
 		this.onlineUsers = new Set();
@@ -106,14 +109,16 @@ class TerminalChat {
 	async autoAuthenticateFromCookie(savedPassword) {
 		try {
 			this.ui.showAuthLoading();
+			// Use the fixed-salt function for auto-auth to maintain compatibility
 			this.encryptionKey = await deriveKeyFromPassword(savedPassword);
+			this.userPassword = savedPassword; // Store for message encryption
 			this.socket?.send(
 				JSON.stringify({
 					password: savedPassword,
 					message_type: "auth",
 				})
 			);
-			// Clear password from memory
+			// Clear password from memory after storing
 			savedPassword = null;
 		} catch (error) {
 			console.error("Auto-auth failed:", error);
@@ -238,6 +243,7 @@ class TerminalChat {
 				// remove bad saved credentials
 				deleteCookie("chat_password");
 				this.encryptionKey = null;
+				this.userPassword = null;
 				this.ui.elements.passwordInput.focus();
 			}
 			return;
@@ -255,11 +261,26 @@ class TerminalChat {
 				if (!this.encryptionKey) {
 					throw new Error("Encryption key not initialized");
 				}
-				const decryptedMessage = await decryptWithKey(
-					this.encryptionKey,
-					data.encrypted_message,
-					data.nonce
-				);
+
+				let decryptedMessage;
+
+				// Check if message has salt (new format) or use legacy decryption
+				if (data.salt && this.userPassword) {
+					// New salt-based decryption
+					decryptedMessage = await decryptWithPassword(
+						this.userPassword,
+						data.encrypted_message,
+						data.nonce,
+						data.salt
+					);
+				} else {
+					// Legacy key-based decryption
+					decryptedMessage = await decryptWithKey(
+						this.encryptionKey,
+						data.encrypted_message,
+						data.nonce
+					);
+				}
 
 				if (data.message_type === "join") {
 					this.ui.displaySystemMessage(`[JOIN] ${decryptedMessage}`);
@@ -271,6 +292,7 @@ class TerminalChat {
 					const decryptedData = { ...data, message: decryptedMessage };
 					delete decryptedData.encrypted_message;
 					delete decryptedData.nonce;
+					delete decryptedData.salt;
 					this.ui.displayMessage(decryptedData, this.username);
 					if (data.username) this.onlineUsers.add(data.username);
 				}
@@ -309,6 +331,7 @@ class TerminalChat {
 
 		try {
 			this.encryptionKey = await deriveKeyFromPassword(password);
+			this.userPassword = password; // Store for message encryption
 		} catch (error) {
 			console.error("Failed to initialize encryption:", error);
 			this.ui.hideAuthLoading();
@@ -416,10 +439,12 @@ class TerminalChat {
 		}
 
 		try {
-			if (!this.encryptionKey) {
-				throw new Error("Encryption key not initialized");
+			if (!this.userPassword) {
+				throw new Error("User password not available for encryption");
 			}
-			const encrypted = await encryptWithKey(this.encryptionKey, message);
+
+			// Use secure salt-based encryption for new messages
+			const encrypted = await encryptWithPassword(this.userPassword, message);
 
 			this.socket?.send(
 				JSON.stringify({
@@ -427,6 +452,7 @@ class TerminalChat {
 					username: this.username,
 					encrypted_message: encrypted.encrypted_message,
 					nonce: encrypted.nonce,
+					salt: encrypted.salt, // Include salt for secure encryption
 					timestamp: new Date().toISOString(),
 					message_type: "chat",
 				})
@@ -476,6 +502,7 @@ class TerminalChat {
 		this.isAuthenticated = false;
 		this.username = "";
 		this.encryptionKey = null;
+		this.userPassword = null; // Clear stored password
 		this.onlineUsers.clear();
 		// clear persisted credentials on explicit logout
 		deleteCookie("chat_password");

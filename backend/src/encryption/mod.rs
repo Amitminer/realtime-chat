@@ -10,7 +10,7 @@
 
 use aes_gcm::{
     Aes256Gcm,
-    aead::{Aead, AeadCore, KeyInit, OsRng},
+    aead::{Aead, AeadCore, KeyInit, OsRng, rand_core::RngCore},
 };
 use base64::{Engine as _, engine::general_purpose};
 use pbkdf2::pbkdf2_hmac;
@@ -22,15 +22,15 @@ use sha2::Sha256;
 /// from a password and AES-256-GCM encryption operations.
 pub struct EncryptionManager {
     cipher: Aes256Gcm,
+    salt: [u8; 16],
 }
 
 impl EncryptionManager {
     /// Create a new encryption manager from a plain-text password.
     ///
     /// This function derives a 256-bit key from the provided password using
-    /// PBKDF2 with a fixed salt (for compatibility with the client-side
-    /// implementation). In a production environment, a randomly generated
-    /// salt should be used and stored with the encrypted data.
+    /// PBKDF2 with a random salt. The salt is stored with the encryption manager
+    /// and used for all encryption operations.
     ///
     /// # Arguments
     ///
@@ -40,11 +40,11 @@ impl EncryptionManager {
     ///
     /// A Result containing the EncryptionManager if successful, or an error
     pub fn new(password: &str) -> Result<Self, Box<dyn std::error::Error + Send + Sync>> {
-        // Use a fixed salt for compatibility with client-side implementation
-        // In a production environment, this should be randomly generated and stored
-        let salt: [u8; 16] = [0x42; 16]; // Fixed salt
+        // Generate a random salt for key derivation
+        let mut salt = [0u8; 16];
+        OsRng.fill_bytes(&mut salt);
 
-        // Derive key using PBKDF2
+        // Derive key using PBKDF2 with the random salt
         let mut key = [0u8; 32];
         pbkdf2_hmac::<Sha256>(password.as_bytes(), &salt, 100000, &mut key);
 
@@ -54,7 +54,7 @@ impl EncryptionManager {
             ))
         })?;
 
-        Ok(Self { cipher })
+        Ok(Self { cipher, salt })
     }
 
     /// Encrypt a UTF-8 message, returning (ciphertext_b64, nonce_b64, salt_b64).
@@ -85,7 +85,7 @@ impl EncryptionManager {
 
         let encrypted_b64 = general_purpose::STANDARD.encode(&ciphertext);
         let nonce_b64 = general_purpose::STANDARD.encode(nonce);
-        let salt_b64 = general_purpose::STANDARD.encode([0x42; 16]); // Fixed salt
+        let salt_b64 = general_purpose::STANDARD.encode(self.salt); // Use the stored random salt
 
         Ok((encrypted_b64, nonce_b64, salt_b64))
     }
