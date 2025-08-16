@@ -2,58 +2,52 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <meta name="theme-color" content="#000000">
     <title>Terminal Chat</title>
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.1.11"></script>
     <link rel="stylesheet" href="styles.css">
 </head>
-<body class="bg-black text-green-400 h-screen overflow-hidden matrix-bg">
-    <div class="h-full flex flex-col w-full max-w-6xl mx-auto terminal-border terminal-scan">
-        <!-- Terminal Header -->
-        <header class="bg-black border-b-2 border-green-400 px-2 sm:px-4 py-2 flex-shrink-0">
-            <div class="flex items-center justify-between text-xs sm:text-sm flex-wrap gap-y-1">
-                <div class="flex items-center space-x-4">
-                    <span class="text-yellow-400">[ROOT@CHATROOM]</span>
-                    <span>~$ ./terminal-chat</span>
-                </div>
+<body class="bg-black text-green-400 matrix-bg">
+    <div class="min-h-screen flex flex-col w-full max-w-3xl mx-auto terminal-border terminal-scan">
+        <header class="bg-black border-b border-green-400 px-4 py-2 flex-shrink-0 sticky top-0 z-50">
+            <div class="flex items-center justify-between text-sm">
+                <span class="text-yellow-400 font-medium">TERMINAL CHAT</span>
                 <div id="connectionStatus" class="flex items-center">
                     <span class="w-2 h-2 bg-red-500 rounded-full mr-2 animate-pulse"></span>
-                    <span class="text-red-400">DISCONNECTED</span>
+                    <span class="text-red-400 font-medium">OFFLINE</span>
                 </div>
             </div>
         </header>
 
         <!-- Password Authentication -->
-        <div id="passwordSection" class="flex-1 flex items-center justify-center p-4 sm:p-8">
+        <div id="passwordSection" class="flex-1 flex items-center justify-center p-4">
             <div class="w-full max-w-md">
                 <div class="terminal-border bg-black p-4 sm:p-6">
                     <div class="text-center mb-6">
-                        <div class="text-red-400 text-lg mb-2">🔒 [SECURE CHANNEL ACCESS]</div>
-                        <div class="text-yellow-400 mb-2">⚠️ CLASSIFIED SYSTEM</div>
-                        <div class="text-green-300">└─$ Enter access code to proceed...</div>
+                        <div class="text-red-400 text-base mb-2 font-medium">🔒 [SECURE ACCESS]</div>
+                        <div class="text-yellow-400 mb-2 text-sm">⚠️ CLASSIFIED SYSTEM</div>
+                        <div class="text-green-300 text-sm">└─$ Enter access code...</div>
                     </div>
                     <form id="passwordForm">
-                        <div class="flex items-center mb-4">
-                            <span class="text-red-500 mr-2">root@secure:~$</span>
+                        <div class="flex items-center gap-2 mb-4">
+                            <span class="text-red-500 text-sm font-medium">root@secure:~$</span>
                             <input
                                 type="password"
                                 id="passwordInput"
                                 placeholder="••••••••••••••"
-                                class="flex-1 bg-transparent border-none outline-none text-green-400 placeholder-green-600 cursor-blink"
+                                class="flex-1 bg-transparent border-b-2 border-green-600 outline-none text-green-400 placeholder-green-600 py-2 text-base font-medium focus:border-green-400 transition-colors"
                                 required
                                 autocomplete="off"
                             >
                         </div>
-                        <button id="passwordSubmit" type="submit" class="w-full bg-red-900 text-red-300 py-2 px-4 border border-red-500 hover:bg-red-800 transition-colors">
-                            [ENTER] AUTHENTICATE ACCESS
+                        <button id="passwordSubmit" type="submit" class="w-full bg-red-900 text-red-300 py-3 px-4 border border-red-500 hover:bg-red-800 active:bg-red-700 transition-colors text-base font-medium min-h-[48px] touch-manipulation">
+                            [ENTER] AUTHENTICATE
                         </button>
-                        <div class="text-xs text-green-600 mt-2 text-center">
-                            * Unauthorized access will be logged and tracked *
-                        </div>
                     </form>
-                    <div id="authError" class="hidden mt-4 text-red-400 text-sm text-center">
+                    <div id="authError" class="hidden mt-4 text-red-400 text-sm text-center font-medium">
                         ❌ ACCESS DENIED - Invalid credentials
                     </div>
                 </div>
@@ -61,28 +55,28 @@
         </div>
 
         <!-- Username Setup -->
-        <div id="usernameSection" class="hidden flex-1 flex items-center justify-center p-4 sm:p-8">
+        <div id="usernameSection" class="hidden flex-1 flex items-center justify-center p-4">
             <div class="w-full max-w-md">
                 <div class="terminal-border bg-black p-4 sm:p-6">
                     <div class="text-center mb-6">
-                        <div class="text-green-400 text-lg mb-2">✅ [ACCESS GRANTED]</div>
-                        <div class="text-yellow-400 mb-2">┌─[USER IDENTIFICATION]</div>
-                        <div class="text-green-300">└─$ Set your handle for secure comms...</div>
+                        <div class="text-green-400 text-base mb-2 font-medium">✅ [ACCESS GRANTED]</div>
+                        <div class="text-yellow-400 mb-2 text-sm">┌─[USER IDENTIFICATION]</div>
+                        <div class="text-green-300 text-sm">└─$ Set your handle...</div>
                     </div>
                     <form id="usernameForm">
-                        <div class="flex items-center mb-4">
-                            <span class="text-green-500 mr-2">user@terminal:~$</span>
+                        <div class="flex items-center gap-2 mb-4">
+                            <span class="text-green-500 text-sm font-medium">user@terminal:~$</span>
                             <input
                                 type="text"
                                 id="usernameInput"
                                 placeholder=""
                                 maxlength="20"
-                                class="flex-1 bg-transparent border-none outline-none text-green-400 placeholder-green-600 cursor-blink"
+                                class="flex-1 bg-transparent border-b-2 border-green-600 outline-none text-green-400 placeholder-green-600 py-2 text-base font-medium focus:border-green-400 transition-colors"
                                 required
                                 autocomplete="off"
                             >
                         </div>
-                        <button type="submit" class="w-full bg-green-900 text-green-300 py-2 px-4 border border-green-500 hover:bg-green-800 transition-colors">
+                        <button type="submit" class="w-full bg-green-900 text-green-300 py-3 px-4 border border-green-500 hover:bg-green-800 active:bg-green-700 transition-colors text-base font-medium min-h-[48px] touch-manipulation">
                             [ENTER] SET IDENTITY
                         </button>
                     </form>
@@ -91,44 +85,46 @@
         </div>
 
         <!-- Chat Interface -->
-        <div id="chatInterface" class="hidden flex-1 min-h-0 flex flex-col">
+        <div id="chatInterface" class="hidden flex-1 flex flex-col min-h-0">
             <!-- Messages Container -->
-            <div id="messagesContainer" class="flex-1 overflow-y-auto p-2 sm:p-4 scrollbar-hide text-xs sm:text-sm leading-relaxed">
+            <div id="messagesContainer" class="flex-1 overflow-y-auto p-4 scrollbar-thin text-sm leading-relaxed">
                 <div class="system-message text-yellow-400 mb-2">Terminal initialized... Connecting to secure channel...</div>
                 <div class="system-message text-yellow-400 mb-4">Type /help for available commands</div>
             </div>
-
-            <!-- Input Area -->
-            <div class="border-t-2 border-green-400 bg-black p-2 sm:p-4 flex-shrink-0">
-                <form id="messageForm" class="flex items-center gap-2">
-                    <span class="text-green-500 mr-1 sm:mr-2 hidden sm:inline" id="promptPrefix">guest@chat:~$</span>
-                    <input
-                        type="text"
-                        id="messageInput"
-                        placeholder=""
-                        maxlength="500"
-                        class="min-w-0 flex-1 bg-transparent border-none outline-none text-green-400 placeholder-green-600"
-                        required
-                        autocomplete="off"
-                    >
-                    <span class="cursor-blink ml-1 hidden sm:inline"></span>
+            
+            <!-- Fixed input with better mobile positioning and safe area support -->
+            <div class="border-t border-green-400 bg-black flex-shrink-0 input-area">
+                <form id="messageForm" class="flex items-center gap-3 p-3">
+                    <div class="flex-1 flex items-center min-w-0">
+                        <span class="text-green-500 text-sm font-medium hidden sm:inline flex-shrink-0 mr-3" id="promptPrefix">guest@chat:~$</span>
+                        <input
+                            type="text"
+                            id="messageInput"
+                            placeholder="Type message..."
+                            maxlength="500"
+                            class="flex-1 bg-transparent border-none outline-none text-green-400 placeholder-green-600 text-base py-2 font-medium min-w-0"
+                            required
+                            autocomplete="off"
+                        >
+                    </div>
                     <button
                       type="submit"
                       id="sendButton"
                       aria-label="Send message"
-                      class="ml-1 sm:ml-2 bg-green-900 text-green-300 py-1.5 px-3 border border-green-500 hover:bg-green-800 transition-colors flex-shrink-0"
+                      class="bg-green-900 text-green-300 px-4 py-2 border border-green-500 hover:bg-green-800 active:bg-green-700 transition-all duration-150 flex-shrink-0 text-sm font-medium min-h-[44px] touch-manipulation rounded"
                     >
-                      [SEND]
+                      <span class="hidden sm:inline">SEND</span>
+                      <span class="sm:hidden">→</span>
                     </button>
                 </form>
             </div>
         </div>
 
-        <!-- Loading State -->
+        <!-- Loading States -->
         <div id="loadingState" class="hidden flex-1 flex items-center justify-center">
             <div class="text-center">
                 <div class="text-green-400 text-xl mb-4">
-                    <span class="inline-block animate-spin">⠋</span> CONNECTING TO SERVER...
+                    <span class="inline-block animate-spin">⠋</span> CONNECTING...
                 </div>
                 <div class="text-green-600 text-sm">
                     Establishing secure connection...
@@ -136,25 +132,24 @@
             </div>
         </div>
 
-        <!-- Authentication Loading State -->
         <div id="authLoadingState" class="hidden flex-1 flex items-center justify-center">
             <div class="text-center">
                 <div class="text-yellow-400 text-xl mb-4">
                     <span class="inline-block animate-spin">⠋</span> AUTHENTICATING...
                 </div>
                 <div class="text-yellow-600 text-sm">
-                    Verifying access credentials...
+                    Verifying credentials...
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Error Messages -->
-    <div id="errorToast" class="hidden fixed top-4 right-4 bg-red-900 border border-red-500 text-red-300 px-4 py-2 text-sm max-w-sm">
+    <div id="errorToast" class="hidden fixed top-4 left-4 right-4 sm:top-4 sm:right-4 sm:left-auto bg-red-900 border border-red-500 text-red-300 px-4 py-3 text-sm max-w-sm sm:max-w-md mx-auto sm:mx-0 z-50">
         <div class="flex items-center justify-between">
-            <span class="text-red-400">[ERROR]</span>
+            <span class="text-red-400 font-medium">[ERROR]</span>
             <span id="errorMessage" class="ml-2 flex-1"></span>
-            <button id="closeError" class="ml-2 text-red-400 hover:text-red-300">×</button>
+            <button id="closeError" class="ml-2 text-red-400 hover:text-red-300 text-lg leading-none min-w-[24px] min-h-[24px] flex items-center justify-center">×</button>
         </div>
     </div>
 

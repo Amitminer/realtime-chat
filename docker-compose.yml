@@ -7,13 +7,13 @@ services:
     environment:
       - HOST=${BACKEND_HOST:-0.0.0.0}
       - PORT=${BACKEND_PORT:-9001}
-      - SERVER_PASSWORD=${SERVER_PASSWORD:-change-me}
+      - SERVER_PASSWORD=${SERVER_PASSWORD:-4871}
       - RUST_BACKTRACE=1
     command: ["/usr/local/bin/realtime-chat"]
     tty: true
     stdin_open: true
-    ports:
-      - "9001:9001"
+    expose:
+      - "9001"
     restart: unless-stopped
 
   frontend:
@@ -26,12 +26,29 @@ services:
       - PORT=${FRONTEND_PORT:-8080}
       - ROOT_DIR=/app/frontend
       - LIVE_RELOAD=false
-      - WS_URL=${WS_URL:-ws://backend:9001}
-    # Entrypoint runs http-serve and validates ROOT_DIR
+      - WS_URL=${WS_URL:-wss://example.com/ws}
     tty: true
     stdin_open: true
-    ports:
-      - "8080:8080"
+    expose:
+      - "8080"
     depends_on:
       - backend
     restart: unless-stopped
+
+  caddy:
+    image: caddy:latest
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - frontend
+      - backend
+
+volumes:
+  caddy_data:
+  caddy_config:

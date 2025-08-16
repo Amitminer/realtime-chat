@@ -1,104 +1,151 @@
 * {
-	font-family: 'JetBrains Mono', 'Courier New', monospace;
+  font-family: "JetBrains Mono", "Courier New", monospace;
 }
 
 body {
-	background: #0a0a0a;
-	color: #00ff00;
+  background: #0a0a0a;
+  color: #00ff00;
+  -webkit-text-size-adjust: 100%;
+  overscroll-behavior: none;
+  touch-action: manipulation;
+}
+
+:root {
+  --scan-animation-duration: 0.6s;
 }
 
 .terminal-scan {
-	background: linear-gradient(rgba(0, 255, 0, 0.03) 50%,
-			transparent 50%);
-	background-size: 100% 4px;
-	animation: scan 0.6s linear infinite;
+  background: linear-gradient(rgba(0, 255, 0, 0.03) 50%, transparent 50%);
+  background-size: 100% 4px;
+  animation: scan var(--scan-animation-duration) linear infinite;
 }
 
 @keyframes scan {
-	0% {
-		background-position: 0 0;
-	}
-
-	100% {
-		background-position: 0 4px;
-	}
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 0 4px;
+  }
 }
 
 .cursor-blink::after {
-	content: '█';
-	animation: blink 1s infinite;
+  content: "█";
+  animation: blink 1s infinite;
 }
 
 @keyframes blink {
-
-	0%,
-	50% {
-		opacity: 1;
-	}
-
-	51%,
-	100% {
-		opacity: 0;
-	}
+  0%,
+  50% {
+    opacity: 1;
+  }
+  51%,
+  100% {
+    opacity: 0;
+  }
 }
 
 .terminal-border {
-	border: 2px solid #00ff00;
-	box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
-}
-
-.message-slide::before {
-	content: '> ';
-	color: #00aa00;
+  border: 1px solid #00ff00;
+  box-shadow: 0 0 15px rgba(0, 255, 0, 0.2);
 }
 
 .system-message::before {
-	content: '[SYSTEM] ';
-	color: #ffff00;
+  content: "[SYS] ";
+  color: #ffff00;
 }
 
-.scrollbar-hide {
-	-ms-overflow-style: none;
-	scrollbar-width: none;
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 255, 0, 0.3) transparent;
 }
 
-.scrollbar-hide::-webkit-scrollbar {
-	display: none;
+.scrollbar-thin::-webkit-scrollbar {
+  width: 3px;
 }
 
-.typing-effect {
-	animation: typing 0.5s steps(20, end);
-	overflow: hidden;
-	white-space: nowrap;
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
 }
 
-@keyframes typing {
-	from {
-		width: 0;
-	}
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: rgba(0, 255, 0, 0.3);
+  border-radius: 2px;
+}
 
-	to {
-		width: 100%;
-	}
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 255, 0, 0.5);
 }
 
 .matrix-bg {
-	background-image:
-		radial-gradient(circle at 25% 25%, #00ff0010 1px, transparent 1px),
-		radial-gradient(circle at 75% 75%, #00ff0008 1px, transparent 1px);
-	background-size: 50px 50px;
+  background-image: radial-gradient(circle at 25% 25%, #00ff0008 1px, transparent 1px),
+    radial-gradient(circle at 75% 75%, #00ff0005 1px, transparent 1px);
+  background-size: 40px 40px;
 }
 
-/* Input field sizing */
-#messageInput {
-	min-width: 100px;
+/* Enhanced input area positioning with proper safe area support */
+.input-area {
+  position: sticky;
+  bottom: 0;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+  margin-bottom: env(safe-area-inset-bottom, 0);
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  .terminal-border {
+    border-width: 1px;
+    box-shadow: 0 0 8px rgba(0, 255, 0, 0.15);
+  }
+
+  #messagesContainer {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+
+  #messageInput {
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+
+  .matrix-bg {
+    background-size: 25px 25px;
+  }
+
+  button {
+    min-height: 44px;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: rgba(0, 255, 0, 0.1);
+  }
+
+  button:active {
+    transform: scale(0.98);
+    transition: transform 0.1s ease;
+  }
+
+  /* Better mobile input positioning */
+  .input-area {
+    padding-bottom: max(0.75rem, env(safe-area-inset-bottom, 0.75rem));
+  }
+}
+
+@media (max-width: 480px) {
+  .matrix-bg {
+    background-size: 20px 20px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .terminal-scan,
+  .cursor-blink::after,
+  button:active {
+    animation: none !important;
+    transform: none !important;
+  }
+}
 
-	.terminal-scan,
-	.cursor-blink::after,
-	.typing-effect {
-		animation: none !important;
-	}
+@media (min-width: 1024px) {
+  .terminal-border {
+    border-width: 2px;
+    box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+  }
 }
