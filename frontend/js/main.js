@@ -1,8 +1,3 @@
-/**
- * Terminal-style chat client.
- * Orchestrates socket lifecycle, authentication, UI state and crypto.
- */
-
 import { deriveKeyFromPassword, decryptWithKey, decryptWithPassword, encryptWithPassword } from "./crypto.js"
 import { UIManager } from "./ui.js"
 import { getCookie, setCookie, deleteCookie } from "./utils.js"
@@ -644,7 +639,7 @@ class TerminalChat {
       savedPassword = null
     } catch (error) {
       console.error("Auto-auth failed:", error)
-      this.ui.hideAuthLoading()
+      this.ui.hideLoading()
       this.ui.showPasswordForm()
     }
   }

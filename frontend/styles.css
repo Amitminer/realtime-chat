@@ -50,11 +50,6 @@ body {
   box-shadow: 0 0 15px rgba(0, 255, 0, 0.2);
 }
 
-.message-slide::before {
-  content: "> ";
-  color: #00aa00;
-}
-
 .system-message::before {
   content: "[SYS] ";
   color: #ffff00;
@@ -88,12 +83,15 @@ body {
   background-size: 40px 40px;
 }
 
-/* Enhanced safe area support for mobile devices */
-.pb-safe {
-  padding-bottom: max(1.5rem, env(safe-area-inset-bottom, 1.5rem));
+/* Enhanced input area positioning with proper safe area support */
+.input-area {
+  position: sticky;
+  bottom: 0;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+  margin-bottom: env(safe-area-inset-bottom, 0);
 }
 
-/* Cleaned up mobile styles */
+/* Mobile optimizations */
 @media (max-width: 768px) {
   .terminal-border {
     border-width: 1px;
@@ -106,7 +104,7 @@ body {
   }
 
   #messageInput {
-    font-size: 16px;
+    font-size: 16px; /* Prevents zoom on iOS */
   }
 
   .matrix-bg {
@@ -122,6 +120,11 @@ body {
   button:active {
     transform: scale(0.98);
     transition: transform 0.1s ease;
+  }
+
+  /* Better mobile input positioning */
+  .input-area {
+    padding-bottom: max(0.75rem, env(safe-area-inset-bottom, 0.75rem));
   }
 }
 
