@@ -83,7 +83,7 @@ body {
   background-size: 40px 40px;
 }
 
-/* Enhanced input area positioning with proper safe area support */
+/* Input area positioning with proper safe area support */
 .input-area {
   position: sticky;
   bottom: 0;
