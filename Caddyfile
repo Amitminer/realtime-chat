@@ -1,0 +1,11 @@
+example.com {
+example.com {
+    # Forward WebSocket traffic under /ws to backend first
+    handle_path /ws* {
+        reverse_proxy backend:9001
+    }
+
+    # Everything else goes to the frontend
+    reverse_proxy frontend:8080
+}
+}

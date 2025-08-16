@@ -1,0 +1,16 @@
+[package]
+name = "http-serve"
+version = "0.5.0"
+edition = "2021"
+description = "Static file server with live-reload and runtime config (/config.js) for the chat frontend"
+license = "MIT"
+readme = "README.md"
+
+[dependencies]
+notify = "8.2.0"
+dotenvy = "0.15.7"
+tungstenite = "0.21"
+sha1 = "0.10"
+base64 = "0.21"
+lazy_static = "1.4"
+serde_json = "1.0"

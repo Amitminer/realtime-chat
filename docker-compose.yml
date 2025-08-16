@@ -1,0 +1,54 @@
+services:
+  backend:
+    image: local/realtime-chat-backend:dev
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    environment:
+      - HOST=${BACKEND_HOST:-0.0.0.0}
+      - PORT=${BACKEND_PORT:-9001}
+      - SERVER_PASSWORD=${SERVER_PASSWORD:-4871}
+      - RUST_BACKTRACE=1
+    command: ["/usr/local/bin/realtime-chat"]
+    tty: true
+    stdin_open: true
+    expose:
+      - "9001"
+    restart: unless-stopped
+
+  frontend:
+    image: local/realtime-chat-frontend:dev
+    build:
+      context: .
+      dockerfile: http-serve/Dockerfile
+    environment:
+      - HOST=${FRONTEND_HOST:-0.0.0.0}
+      - PORT=${FRONTEND_PORT:-8080}
+      - ROOT_DIR=/app/frontend
+      - LIVE_RELOAD=false
+      - WS_URL=${WS_URL:-wss://example.com/ws}
+    tty: true
+    stdin_open: true
+    expose:
+      - "8080"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+  caddy:
+    image: caddy:latest
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - frontend
+      - backend
+
+volumes:
+  caddy_data:
+  caddy_config:

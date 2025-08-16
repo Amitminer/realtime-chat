@@ -1,0 +1,15 @@
+# Node/JS
+node_modules/
+
+# Rust
+**/target/
+
+# Env
+.env
+strace.log
+todo.md
+HardFix.md
+# Build artifacts
+/dist/
+/build/
+/.DS_Store
